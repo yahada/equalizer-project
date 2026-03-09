@@ -32,8 +32,20 @@ namespace equalizer
       std::cerr << "open file problem\n";
       throw;
     }
-    file.read(reinterpret_cast<char*>(&header), sizeof(WavHeader));
+    file.read(reinterpret_cast< char* >(&header), sizeof(WavHeader));
 
+  }
+  
+  void saveWav(const std::string& filename, const WavHeader& header, const std::vector< int16_t > audioData)
+  {
+    std::ofstream file(filename, std::ios::binary);
+    if (!file.is_open())
+    {
+      std::cerr << "cannot create" << filename << "\n";
+      throw;
+    }
+    file.write(reinterpret_cast< const char* >(&header), sizeof(WavHeader));
+    file.write(reinterpret_cast< const char* >(audioData.data()), audioData.size() * sizeof(int16_t));
   }
 
   void showInfo(WavHeader& header)
@@ -61,13 +73,15 @@ namespace equalizer
 int main()
 {
   equalizer::WavHeader header;
+  std::vector< int16_t > audioData; //сделай функцию loadWav которая запишет сэмплы
   try
   {
     equalizer::loadWavHeader("file_example_WAV_2MG.wav", header);
+    equalizer::saveWav("file_example_WAV_2MG.wav", header, audioData);
   }
   catch(const std::exception& e)
   {
-    std::cerr << e.what() << '\n';
+    std::cerr << "Error: " << e.what() << '\n';
     return 1;
   }
 

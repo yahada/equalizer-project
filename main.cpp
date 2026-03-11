@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdint>
 #include <fstream>
+#include <vector>
 
 namespace equalizer
 {
@@ -23,25 +24,68 @@ namespace equalizer
     uint32_t subchunk2Size_;
   };
 
-
-  void loadWavHeader(const std::string& filename, WavHeader& header)
+  bool checkCorrectnessOfHeader(const WavHeader& header, std::string& errorMsg)
   {
+
+    if (std::string(header.chunkID_, 4) != "RIFF")
+    {
+      errorMsg = "Not a valid RIFF file";
+      return false;
+    }
+
+    if (std::string(header.format_, 4) != "WAVE")
+    {
+      errorMsg = "Not a valid WAVE file";
+      return false;
+    }
+
+    if (std::string(header.subchunk1ID_, 3) == "fmt")
+    {
+      errorMsg = "Missing <<fmt>> sub chunck in input file";
+      return false;
+    }
+
+    if (std::string(header.subchunk2ID_, 4) == "data")
+    {
+      errorMsg = "Missing <<data>> sub chunck in input file";
+      return false;
+    }
+  }
+
+  void readWavFile(const std::string& filename, WavHeader& header, std::vector< int16_t >& audioData)
+  {
+    size_t size = filename.size();
+    if (filename.substr(size - 4, 4) != ".wav")
+    {
+      throw std::invalid_argument("Wrong file format");
+    }
+
     std::ifstream file(filename, std::ios::binary);
+
     if (!file.is_open())
     {
-      std::cerr << "open file problem\n";
-      throw;
+      throw std::invalid_argument("File opening trouble");
     }
+
     file.read(reinterpret_cast< char* >(&header), sizeof(WavHeader));
 
+    std::string errMsg;
+    if (!checkCorrectnessOfHeader(header, errMsg))
+    {
+      throw std::invalid_argument(errMsg);
+    }
+
+    audioData.resize(header.subchunk2Size_ / sizeof(int16_t));
+
+    file.read(reinterpret_cast<char*>(audioData.data()), header.subchunk2Size_);
   }
-  
+
   void saveWav(const std::string& filename, const WavHeader& header, const std::vector< int16_t > audioData)
   {
     std::ofstream file(filename, std::ios::binary);
     if (!file.is_open())
     {
-      std::cerr << "cannot create" << filename << "\n";
+      std::cerr << "Problems with creation file" << filename << "\n";
       throw;
     }
     file.write(reinterpret_cast< const char* >(&header), sizeof(WavHeader));
@@ -69,21 +113,18 @@ namespace equalizer
 
 }
 
-
 int main()
 {
   equalizer::WavHeader header;
-  std::vector< int16_t > audioData; //сделай функцию loadWav которая запишет сэмплы
+  std::vector< int16_t > audioData;
   try
   {
-    equalizer::loadWavHeader("file_example_WAV_2MG.wav", header);
-    equalizer::saveWav("file_example_WAV_2MG.wav", header, audioData);
+    equalizer::readWavFile("file_example_WAV_1MG.wav", header, audioData);
+    equalizer::saveWav("new_file.wav", header, audioData);
   }
   catch(const std::exception& e)
   {
     std::cerr << "Error: " << e.what() << '\n';
     return 1;
   }
-
-  equalizer::showInfo(header);
 }

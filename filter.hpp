@@ -12,14 +12,28 @@ namespace equalizer {
     float lastY_;
   };
 
-  class Filter {
+  class HighPass {
   public:
-    float countAlpha(float cutoff);
+    HighPass(float alpha):
+      lp_(alpha)
+    {}
 
+    float process(float x)
+    {
+      return x - lp_.proccess(x);
+    }
 
   private:
-    WavHeader header;
+      LowPass lp_;
+  };
+
+  class Filter {
+  public:
+    Filter(WavHeader header);
+    float countAlpha(float cutoff);
     std::vector< float > convert(std::vector< int16_t >);
+  private:
+    WavHeader header_;
   };
 }
 

@@ -2,6 +2,11 @@
 #include <math.h>
 namespace equalizer
 {
+  Filter::Filter(WavHeader header):
+    header_(header)
+  {}
+
+
   std::vector< float > Filter::convert(std::vector< int16_t > AudioDataRaw)
   {
     std::vector< float > samples(AudioDataRaw.size());
@@ -14,8 +19,8 @@ namespace equalizer
 
   float Filter::countAlpha(float cutoff)
   {
-    float dt = 1 / header.sampleRate_;
-    float rc = 1 / (2 * M_PI * cutoff);
+    float dt = 1.0f / header_.sampleRate_;
+    float rc = 1.0f / (2 * M_PI * cutoff);
     return dt / (rc + dt);
   }
 

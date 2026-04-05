@@ -13,7 +13,7 @@ namespace equalizer
     void readWavFile(const std::string& filename, std::vector< int16_t >& audioData);
     void saveWav(const std::string& filename, const std::vector< int16_t > audioData);
     void showInfo(std::ostream& out) const noexcept;
-  private:
+  // private:
     char chunkID_[4];
     uint32_t chunkSize_;
     char format_[4];

@@ -7,6 +7,7 @@
 #include <vector>
 namespace equalizer
 {
+  class Filter;
   class WavHeader
   {
   public:
@@ -14,6 +15,7 @@ namespace equalizer
     void saveWav(const std::string& filename, const std::vector< int16_t > audioData);
     void showInfo(std::ostream& out) const noexcept;
   private:
+    friend class Filter;
     char chunkID_[4];
     uint32_t chunkSize_;
     char format_[4];

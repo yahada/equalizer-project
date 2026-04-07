@@ -57,7 +57,7 @@ void equalizer::WavHeader::readWavFile(const std::string& filename, std::vector<
   file.read(reinterpret_cast< char* >(audioData.data()), subchunk2Size_);
 }
 
-void equalizer::WavHeader::saveWav(const std::string& filename, const std::vector<int16_t> audioData)
+void equalizer::WavHeader::saveWav(const std::string& filename, const std::vector<int16_t>& audioData)
 {
   std::ofstream file(filename, std::ios::binary);
   if (!file.is_open())

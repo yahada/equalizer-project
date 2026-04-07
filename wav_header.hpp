@@ -8,15 +8,17 @@
 namespace equalizer
 {
   class Filter;
+  class Equalizer;
   class WavHeader
   {
   public:
     void readWavFile(const std::string& filename, std::vector< int16_t >& audioData);
     void saveWav(const std::string& filename, const std::vector< int16_t >& audioData);
     void showInfo(std::ostream& out) const noexcept;
-  // private:
+  private:
 
     friend class Filter;
+    friend class Equalizer;
     char chunkID_[4];
     uint32_t chunkSize_;
     char format_[4];
@@ -34,6 +36,7 @@ namespace equalizer
     uint32_t subchunk2Size_;
 
     bool checkCorrectnessOfHeader(std::string& errorMsg);
+    float countAlpha(float cutoff);
   };
 }
 

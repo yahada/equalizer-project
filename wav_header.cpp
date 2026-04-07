@@ -15,6 +15,24 @@ bool equalizer::WavHeader::checkCorrectnessOfHeader(std::string& errorMsg)
     return false;
   }
 
+  if (sampleRate_ != 44100 && sampleRate_ != 48000)
+  {
+    errorMsg = "Equalizer support work with files with sample rate = 44100 or 4800 Hz";
+    return false;
+  }
+
+  if (numChannels_ != 1 && numChannels_ != 2)
+  {
+    errorMsg = "Equalizer support work only with files with 1 or 2 channels";
+    return false;
+  }
+
+  if (bitsPerSample_ != 16)
+  {
+    errorMsg = "Equalizer support work only with 16 bit files";
+    return false;
+  }
+
   if (std::string(subchunk1ID_, 3) != "fmt")
   {
     errorMsg = "Missing <<fmt>> sub chunck in input file";
@@ -31,8 +49,7 @@ bool equalizer::WavHeader::checkCorrectnessOfHeader(std::string& errorMsg)
 
 void equalizer::WavHeader::readWavFile(const std::string& filename, std::vector< int16_t >& audioData)
 {
-  size_t size = filename.size();
-  if (filename.substr(size - 4, 4) != ".wav")
+  if (filename.substr(filename.size() - 4, 4) != ".wav")
   {
     throw std::invalid_argument("Wrong file format");
   }
@@ -69,7 +86,7 @@ void equalizer::WavHeader::saveWav(const std::string& filename, const std::vecto
   file.write(reinterpret_cast< const char* >(audioData.data()), audioData.size() * sizeof(int16_t));
 }
 
-void equalizer::WavHeader::showInfo(std::ostream& out = std::cout) const noexcept
+void equalizer::WavHeader::showInfo(std::ostream& out) const noexcept
 {
   std::cout << "ChunkID: " << chunkID_ << '\n';
   std::cout << "ChunkSize: " << chunkSize_ << '\n';

@@ -1,4 +1,6 @@
 #include "equalizer.hpp"
+#include <cstdio>
+#include <math.h>
 
 void equalizer::Equalizer::StereoToMono()
 {
@@ -11,6 +13,12 @@ void equalizer::Equalizer::StereoToMono()
     monoData[i / 2] =  sum / 2;
   }
   audioData_ = monoData;
+  header_.numChannels_ = 1;
+  uint32_t tmpSize = header_.subchunk2Size_ / 2;
+  header_.chunkSize_ -= tmpSize;
+  header_.subchunk2Size_ /= 2;
+  header_.blockAlign_ = header_.numChannels_ * header_.bitsPerSample_ / 8;
+  header_.byteRate_ = header_.sampleRate_ * header_.numChannels_ * header_.bitsPerSample_ / 8;
 }
 
 void equalizer::Equalizer::openFile(const std::string& filename)
@@ -20,4 +28,49 @@ void equalizer::Equalizer::openFile(const std::string& filename)
   header.readWavFile(filename, audioData);
   header_ = header;
   audioData_ = audioData;
+}
+
+void equalizer::Equalizer::saveFile(const std::string& filename)
+{
+  header_.saveWav(filename, audioData_);
+}
+
+void equalizer::Equalizer::renameFile(const std::string& oldName, const std::string& newName)
+{
+  if (oldName.substr(oldName.size() - 4, 4) != ".wav")
+  {
+    throw std::invalid_argument("Wrong file format");
+  }
+
+  if (newName.substr(newName.size() - 4, 4) != ".wav")
+  {
+    throw std::invalid_argument("Can't save to this file because file has wrong format");
+  }
+
+  if (std::rename(oldName.c_str(), newName.c_str()) != 0) {
+    throw std::logic_error("no file with this name");
+  }
+}
+
+
+void equalizer::Equalizer::showInfoAboutFile(std::ostream& out)
+{
+  header_.showInfo(out);
+}
+
+std::vector< float > equalizer::Equalizer::convert()
+{
+    std::vector< float > samples(audioData_.size());
+    for (size_t i = 0; i < audioData_.size(); ++i)
+    {
+      samples[i] = audioData_[i] / 32768.0f;
+    }
+    return samples;
+}
+
+float equalizer::Equalizer::countAlpha(float cutoff)
+{
+  float dt = 1.0f / header_.sampleRate_;
+  float rc = 1.0f / (2 * M_PI * cutoff);
+  return dt / (rc + dt);
 }

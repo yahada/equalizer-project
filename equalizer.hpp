@@ -23,8 +23,9 @@ namespace equalizer
   private:
     WavHeader header_;
     std::vector< int16_t > audioData_;
-    float leftCut_;
-    float RightCut_;
+    float leftCut_ = 0.0f;
+    float RightCut_ = 0.0f;
+
     float gainLow_ = 1.0f;
     float gainMid_ = 1.0f;
     float gainHigh_ = 1.0f;

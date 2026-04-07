@@ -1,4 +1,5 @@
 #include "wav_header.hpp"
+#include "filter.hpp"
 
 namespace equalizer {
   std::vector< int16_t > fromStereoToMono(std::vector< int16_t > stereoData)
@@ -15,6 +16,7 @@ namespace equalizer {
   }
 }
 
+
 int main()
 {
   equalizer::WavHeader header;
@@ -30,8 +32,6 @@ int main()
     header.blockAlign_ = 2;
     header.byteRate_ /= 2;
     header.showInfo(std::cout);
-
-    header.saveWav("new_file.wav", monoData);
   }
   catch(const std::exception& e)
   {

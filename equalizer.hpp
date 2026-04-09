@@ -14,7 +14,7 @@ namespace equalizer
 
     void cutFromLeft(const float& cutSize);
     void cutFromRight(const float& cutSize);
-    void muteAudio();
+    void changeMuteStatus();
     void increaseVolume(float);
     void decreaseVolume(float);
     void StereoToMono();
@@ -24,6 +24,7 @@ namespace equalizer
   private:
     WavHeader header_;
     std::vector< int16_t > audioData_;
+    bool isMuted_ = false;
     float leftCut_ = 0.0f;
     float RightCut_ = 0.0f;
 

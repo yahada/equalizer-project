@@ -99,3 +99,18 @@ void equalizer::Equalizer::reverse()
   }
   audioData_ = reversedData;
 }
+
+void equalizer::Equalizer::cutFromLeft(const float& cutSize)
+{
+  leftCut_ = cutSize;
+}
+
+void equalizer::Equalizer::cutFromRight(const float& cutSize)
+{
+  RightCut_ = cutSize;
+}
+
+void equalizer::Equalizer::changeMuteStatus()
+{
+  isMuted_ = !isMuted_;
+}

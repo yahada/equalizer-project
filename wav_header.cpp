@@ -88,19 +88,19 @@ void equalizer::WavHeader::saveWav(const std::string& filename, const std::vecto
 
 void equalizer::WavHeader::showInfo(std::ostream& out) const noexcept
 {
-  std::cout << "ChunkID: " << chunkID_ << '\n';
-  std::cout << "ChunkSize: " << chunkSize_ << '\n';
-  std::cout << "Format: " << format_ << '\n';
+  out << "ChunkID: " << chunkID_ << '\n';
+  out << "ChunkSize: " << chunkSize_ << '\n';
+  out << "Format: " << format_ << '\n';
 
-  std::cout << "Subchunk1ID: " << subchunk1ID_ << '\n';
-  std::cout << "Subchunk1Size: " << subchunkSize_ << '\n';
-  std::cout << "AudioFormat: " << audioFormat_ << '\n';
-  std::cout << "NumChannels: " << numChannels_ << '\n';
-  std::cout << "SampleRate: " << sampleRate_ << '\n';
-  std::cout << "ByteRate: " << byteRate_ << '\n';
-  std::cout << "BlockAlign: " << blockAlign_ << '\n';
-  std::cout << "BitsPerSample: " << bitsPerSample_ << '\n';
+  out << "Subchunk1ID: " << subchunk1ID_ << '\n';
+  out << "Subchunk1Size: " << subchunkSize_ << '\n';
+  out << "AudioFormat: " << audioFormat_ << '\n';
+  out << "NumChannels: " << numChannels_ << '\n';
+  out << "SampleRate: " << sampleRate_ << '\n';
+  out << "ByteRate: " << byteRate_ << '\n';
+  out << "BlockAlign: " << blockAlign_ << '\n';
+  out << "BitsPerSample: " << bitsPerSample_ << '\n';
 
-  std::cout << "Subchunk2ID: " << subchunk2ID_ << '\n';
-  std::cout << "Subchunk2Size: " << subchunk2Size_ << '\n';
+  out << "Subchunk2ID: " << subchunk2ID_ << '\n';
+  out << "Subchunk2Size: " << subchunk2Size_ << '\n';
 }

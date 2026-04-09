@@ -53,7 +53,7 @@ void equalizer::Equalizer::renameFile(const std::string& oldName, const std::str
 }
 
 
-void equalizer::Equalizer::showInfoAboutFile(std::ostream& out)
+void equalizer::Equalizer::showInfoAboutFile(std::ostream& out) const
 {
   header_.showInfo(out);
 }
@@ -68,7 +68,7 @@ std::vector< float > equalizer::Equalizer::convert()
     return samples;
 }
 
-float equalizer::Equalizer::countAlpha(float cutoff)
+float equalizer::Equalizer::countAlpha(const float& cutoff) const noexcept
 {
   float dt = 1.0f / header_.sampleRate_;
   float rc = 1.0f / (2 * M_PI * cutoff);
@@ -110,7 +110,7 @@ void equalizer::Equalizer::cutFromRight(const float& cutSize)
   RightCut_ = cutSize;
 }
 
-void equalizer::Equalizer::changeMuteStatus()
+void equalizer::Equalizer::changeMuteStatus() noexcept
 {
   isMuted_ = !isMuted_;
 }

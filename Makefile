@@ -1,10 +1,13 @@
-CXXFLAGS  += -Wall -Wextra -std=c++14 -MMD
+CXXFLAGS += -Wall -Wextra -std=c++14 -MMD
 
-main:
-	$(CXX) *.cpp -o $@
+main: main.o filter.o equalizer.o wav_header.o
+	$(CXX) $^ -o $@
 
 clean:
-	-@$(RM) main.d main.o
+	-@$(RM) *.d *.o
 	@$(RM) main
+
+run: main
+	./main
 
 -include main.d

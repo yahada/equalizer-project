@@ -16,7 +16,6 @@ namespace equalizer
     void saveWav(const std::string& filename, const std::vector< int16_t >& audioData);
     void showInfo(std::ostream& out) const noexcept;
   private:
-
     friend class Filter;
     friend class Equalizer;
     char chunkID_[4];
@@ -36,7 +35,6 @@ namespace equalizer
     uint32_t subchunk2Size_;
 
     bool checkCorrectnessOfHeader(std::string& errorMsg);
-    float countAlpha(float cutoff);
   };
 }
 

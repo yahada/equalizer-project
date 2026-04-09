@@ -6,17 +6,16 @@ namespace equalizer
 {
   class Equalizer {
   public:
-
-    void openFile(const std::string& filename);
-    void saveFile(const std::string& filename);
-    void renameFile(const std::string& oldName, const std::string& newName);
-    void showInfoAboutFile(std::ostream& out);
+    void openFile(const std::string&);
+    void saveFile(const std::string&);
+    void renameFile(const std::string&, const std::string&);
+    void showInfoAboutFile(std::ostream&) const;
 
     void cutFromLeft(const float& cutSize);
     void cutFromRight(const float& cutSize);
     void changeMuteStatus();
-    void increaseVolume(float);
-    void decreaseVolume(float);
+    void increaseVolume(const float&);
+    void decreaseVolume(const float&);
     void StereoToMono();
     void reverse();
     void inversion();
@@ -32,7 +31,7 @@ namespace equalizer
     float gainMid_ = 1.0f;
     float gainHigh_ = 1.0f;
     std::vector< float > convert();
-    float countAlpha(float cutoff);
+    float countAlpha(const float& cutoff) const noexcept;
 
     //...
   };

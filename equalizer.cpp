@@ -74,3 +74,28 @@ float equalizer::Equalizer::countAlpha(float cutoff)
   float rc = 1.0f / (2 * M_PI * cutoff);
   return dt / (rc + dt);
 }
+
+void equalizer::Equalizer::inversion()
+{
+  std::vector< int16_t > inversedData(audioData_.size());
+  for (size_t i = 0; i < audioData_.size(); ++i)
+  if (audioData_[i] == -32768)
+  {
+    inversedData[i] = 32767;
+  }
+  else
+  {
+    inversedData[i] = -audioData_[i];
+  }
+  audioData_ = inversedData;
+}
+
+void equalizer::Equalizer::reverse()
+{
+  std::vector< int16_t > reversedData(audioData_.size());
+  for (size_t i = 0; i < audioData_.size(); ++i)
+  {
+    reversedData[i] = audioData_[audioData_.size() - i - 1];
+  }
+  audioData_ = reversedData;
+}

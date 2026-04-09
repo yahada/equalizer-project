@@ -18,6 +18,7 @@ namespace equalizer
     void increaseVolume(float);
     void decreaseVolume(float);
     void StereoToMono();
+    void reverse();
     void inversion();
     void play();
   private:

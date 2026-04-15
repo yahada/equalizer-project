@@ -28,11 +28,12 @@ void equalizer::Equalizer::openFile(const std::string& filename)
   header.readWavFile(filename, audioData);
   header_ = header;
   audioData_ = audioData;
+  changedAudioData_ = audioData_;
 }
 
 void equalizer::Equalizer::saveFile(const std::string& filename)
 {
-  header_.saveWav(filename, audioData_);
+  header_.saveWav(filename, changedAudioData_);
 }
 
 void equalizer::Equalizer::renameFile(const std::string& oldName, const std::string& newName)
@@ -60,10 +61,10 @@ void equalizer::Equalizer::showInfoAboutFile(std::ostream& out) const
 
 std::vector< float > equalizer::Equalizer::convert()
 {
-    std::vector< float > samples(audioData_.size());
-    for (size_t i = 0; i < audioData_.size(); ++i)
+    std::vector< float > samples(changedAudioData_.size());
+    for (size_t i = 0; i < changedAudioData_.size(); ++i)
     {
-      samples[i] = audioData_[i] / 32768.0f;
+      samples[i] = changedAudioData_[i] / 32768.0f;
     }
     return samples;
 }
@@ -79,15 +80,15 @@ void equalizer::Equalizer::inversion()
 {
   std::vector< int16_t > inversedData(audioData_.size());
   for (size_t i = 0; i < audioData_.size(); ++i)
-  if (audioData_[i] == -32768)
+  if (changedAudioData_[i] == -32768)
   {
     inversedData[i] = 32767;
   }
   else
   {
-    inversedData[i] = -audioData_[i];
+    inversedData[i] = -changedAudioData_[i];
   }
-  audioData_ = inversedData;
+  changedAudioData_ = inversedData;
 }
 
 void equalizer::Equalizer::reverse()
@@ -95,9 +96,9 @@ void equalizer::Equalizer::reverse()
   std::vector< int16_t > reversedData(audioData_.size());
   for (size_t i = 0; i < audioData_.size(); ++i)
   {
-    reversedData[i] = audioData_[audioData_.size() - i - 1];
+    reversedData[i] = changedAudioData_[changedAudioData_.size() - i - 1];
   }
-  audioData_ = reversedData;
+  changedAudioData_ = reversedData;
 }
 
 void equalizer::Equalizer::cutFromLeft(const float& cutSize)
@@ -113,4 +114,29 @@ void equalizer::Equalizer::cutFromRight(const float& cutSize)
 void equalizer::Equalizer::changeMuteStatus() noexcept
 {
   isMuted_ = !isMuted_;
+}
+
+void equalizer::Equalizer::changeVolume(const float& lowFreqGain, const float& midFreqGain, const float& highFreqGain)
+{
+  std::vector< float > convertedData = convert();
+  std::vector< int16_t > changedAudioData(audioData_.size());
+  equalizer::BiquadFilter lbf(equalizer::FilterTypeEnum::bq_type_lowpass, 200.0 / header_.sampleRate_, 0.707, 0);
+  equalizer::BiquadFilter hbf(equalizer::FilterTypeEnum::bq_type_highpass, 3000.0 / header_.sampleRate_, 0.707, 0);
+
+  for (size_t i = 0; i < audioData_.size(); ++i)
+  {
+    float lowFreqSample = lbf.process(convertedData[i]);
+    float highFreqSample = hbf.process(convertedData[i]);
+    float midFreqSample = (convertedData[i] - lowFreqSample - highFreqSample);
+
+    lowFreqSample  *= (lowFreqGain  + gainLow_);
+    highFreqSample  *= (midFreqGain  + gainMid_);
+    midFreqSample *= (highFreqGain + gainHigh_);
+
+    changedAudioData[i] = (lowFreqSample + highFreqSample + midFreqSample) * 32768.0f;
+  }
+  gainLow_ += lowFreqGain;
+  gainMid_ += midFreqGain;
+  gainHigh_ += gainHigh_;
+  changedAudioData_ = changedAudioData;
 }

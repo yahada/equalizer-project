@@ -4,6 +4,7 @@
 #include "filter.hpp"
 namespace equalizer
 {
+
   class Equalizer {
   public:
     void openFile(const std::string&);
@@ -14,15 +15,15 @@ namespace equalizer
     void cutFromLeft(const float& cutSize);
     void cutFromRight(const float& cutSize);
     void changeMuteStatus() noexcept;
-    void increaseVolume(const float&);
-    void decreaseVolume(const float&);
+    void changeVolume(const float& lowFreqGain, const float& midFreqGain, const float& highFreqGain);
     void StereoToMono();
     void reverse();
     void inversion();
     void play();
-  // private:
+  private:
     WavHeader header_;
     std::vector< int16_t > audioData_;
+    std::vector< int16_t > changedAudioData_;
     bool isMuted_ = false;
     float leftCut_ = 0.0f;
     float RightCut_ = 0.0f;
@@ -32,8 +33,6 @@ namespace equalizer
     float gainHigh_ = 1.0f;
     std::vector< float > convert();
     float countAlpha(const float& cutoff) const noexcept;
-
-    //...
   };
 }
 

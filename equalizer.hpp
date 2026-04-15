@@ -32,7 +32,6 @@ namespace equalizer
     float gainMid_ = 1.0f;
     float gainHigh_ = 1.0f;
     std::vector< float > convert();
-    float countAlpha(const float& cutoff) const noexcept;
   };
 }
 

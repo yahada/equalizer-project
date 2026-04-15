@@ -61,19 +61,12 @@ void equalizer::Equalizer::showInfoAboutFile(std::ostream& out) const
 
 std::vector< float > equalizer::Equalizer::convert()
 {
-    std::vector< float > samples(changedAudioData_.size());
-    for (size_t i = 0; i < changedAudioData_.size(); ++i)
+    std::vector< float > samples(audioData_.size());
+    for (size_t i = 0; i < audioData_.size(); ++i)
     {
-      samples[i] = changedAudioData_[i] / 32768.0f;
+      samples[i] = audioData_[i] / 32768.0f;
     }
     return samples;
-}
-
-float equalizer::Equalizer::countAlpha(const float& cutoff) const noexcept
-{
-  float dt = 1.0f / header_.sampleRate_;
-  float rc = 1.0f / (2 * M_PI * cutoff);
-  return dt / (rc + dt);
 }
 
 void equalizer::Equalizer::inversion()
@@ -122,21 +115,21 @@ void equalizer::Equalizer::changeVolume(const float& lowFreqGain, const float& m
   std::vector< int16_t > changedAudioData(audioData_.size());
   equalizer::BiquadFilter lbf(equalizer::FilterTypeEnum::bq_type_lowpass, 200.0 / header_.sampleRate_, 0.707, 0);
   equalizer::BiquadFilter hbf(equalizer::FilterTypeEnum::bq_type_highpass, 3000.0 / header_.sampleRate_, 0.707, 0);
-
+  gainLow_ += lowFreqGain;
+  gainMid_ += midFreqGain;
+  gainHigh_ += highFreqGain;
   for (size_t i = 0; i < audioData_.size(); ++i)
   {
     float lowFreqSample = lbf.process(convertedData[i]);
     float highFreqSample = hbf.process(convertedData[i]);
     float midFreqSample = (convertedData[i] - lowFreqSample - highFreqSample);
 
-    lowFreqSample  *= (lowFreqGain  + gainLow_);
-    highFreqSample  *= (midFreqGain  + gainMid_);
-    midFreqSample *= (highFreqGain + gainHigh_);
+    lowFreqSample *= gainLow_;
+    highFreqSample *= gainMid_;
+    midFreqSample *= gainHigh_;
 
-    changedAudioData[i] = (lowFreqSample + highFreqSample + midFreqSample) * 32768.0f;
+    float resSample = (lowFreqSample + highFreqSample + midFreqSample) * 32768.0f;
+    changedAudioData[i] = resSample > 32767 ? 32767 : resSample;
   }
-  gainLow_ += lowFreqGain;
-  gainMid_ += midFreqGain;
-  gainHigh_ += gainHigh_;
   changedAudioData_ = changedAudioData;
 }

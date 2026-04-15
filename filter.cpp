@@ -8,7 +8,7 @@ equalizer::BiquadFilter::BiquadFilter():
   inputPrev2_(0.0),
   outputPrev1_(0.0),
   outputPrev2_(0.0),
-  fc_(0.5),
+  fc_(0.3),
   q_(0.707),
   peakGain_(0.0),
   tmp1_(0.0),

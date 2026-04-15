@@ -3,8 +3,8 @@
 #include "wav_header.hpp"
 
 namespace equalizer {
-  enum {
-    bq_type_lowpass = 0,
+  enum FilterTypeEnum {
+    bq_type_lowpass,
     bq_type_highpass,
     bq_type_bandpass,
     bq_type_notch,
@@ -13,21 +13,21 @@ namespace equalizer {
     bq_type_highshelf
   };
 
-  class Biquad {
+  class BiquadFilter {
   public:
-    Biquad();
-    Biquad(const int& filterType, const double& fc, const double& q, const double& peakGainDB);
-    void setType(const int& filterType);
+    BiquadFilter();
+    BiquadFilter(const FilterTypeEnum& filterType, const double& fc, const double& q, const double& peakGain);
+    void setFilterType(const FilterTypeEnum& filterType);
     void setQ(const double& q);
     void setFc(const double& fc);
     void setPeakGain(const double&  peakGainDB);
-    void setBiquad(const int& filterType, const double& fc, const double& q, const double& peakGainDB);
+    void setBiquad(const FilterTypeEnum& filterType, const double& fc, const double& q, const double& peakGain);
     float process(const float& input);
   private:
     void calcBiquad();
-    int filterType_;
-    double inputCurr, inputPrev1_, inputPrev2_, outputPrev1_, outputPrev2_;
-    double Fc_, Q_, peakGain_;
+    FilterTypeEnum filterType_;
+    double inputCurr_, inputPrev1_, inputPrev2_, outputPrev1_, outputPrev2_;
+    double fc_, q_, peakGain_;
     double tmp1_, tmp2_;
   };
 }

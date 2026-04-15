@@ -1,26 +1,64 @@
 #include "filter.hpp"
 #include <math.h>
-namespace equalizer
+
+equalizer::BiquadFilter::BiquadFilter():
+  filterType_(FilterTypeEnum::bq_type_lowpass),
+  inputCurr_(1.0),
+  inputPrev1_(0.0),
+  inputPrev2_(0.0),
+  outputPrev1_(0.0),
+  outputPrev2_(0.0),
+  fc_(0.5),
+  q_(0.707),
+  peakGain_(0.0),
+  tmp1_(0.0),
+  tmp2_(0.0)
+{}
+
+equalizer::BiquadFilter::BiquadFilter(const FilterTypeEnum& filterType, const double& fc, const double& q, const double& peakGain):
+  filterType_(filterType),
+  inputCurr_(1.0),
+  inputPrev1_(0.0),
+  inputPrev2_(0.0),
+  outputPrev1_(0.0),
+  outputPrev2_(0.0),
+  fc_(fc),
+  q_(q),
+  peakGain_(peakGain),
+  tmp1_(0.0),
+  tmp2_(0.0)
+{}
+
+void equalizer::BiquadFilter::setFilterType(const FilterTypeEnum& filterType)
 {
-  LowPass::LowPass(float alpha):
-    alpha_(alpha),
-    lastY_(0)
-  {}
+  filterType_ = filterType;
+  calcBiquad();
+}
 
-  float LowPass::proccess(float x)
-  {
-    float y = (alpha_ * x) + ((1 - alpha_) * lastY_);
-    lastY_ = y;
-    return y;
-  }
+void equalizer::BiquadFilter::setFc(const double& fc)
+{
+  fc_ = fc;
+  calcBiquad();
+}
 
-  HighPass::HighPass(float alpha):
-    lp_(alpha)
-  {}
+void equalizer::BiquadFilter::setPeakGain(const double& peakGain)
+{
+  peakGain_ = peakGain;
+  calcBiquad();
+}
 
-  float HighPass::process(float x)
-  {
-    return x - lp_.proccess(x);
-  }
+void equalizer::BiquadFilter::setQ(const double& q)
+{
+  q_ = q;
+  calcBiquad();
+}
+
+void equalizer::BiquadFilter::setBiquad(const FilterTypeEnum& filterType, const double& fc, const double& q, const double& peakGain)
+{
+  filterType_ = filterType;
+  fc_ = fc;
+  q_ = q;
+  peakGain_ = peakGain;
+  calcBiquad();
 }
 

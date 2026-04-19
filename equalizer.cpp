@@ -34,6 +34,13 @@ void equalizer::Equalizer::openFile(const std::string& filename)
   header_ = header;
   audioData_ = audioData;
   changedAudioData_ = audioData_;
+
+  isMuted_ = false;
+  leftCut_ = 0.0f;
+  RightCut_ = 0.0f;
+  gainLow_ = 1.0f;
+  gainMid_ = 1.0f;
+  gainHigh_ = 1.0f;
 }
 
 void equalizer::Equalizer::saveFile(const std::string& filename)

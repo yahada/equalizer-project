@@ -21,7 +21,6 @@ void equalizer::cliEqualizer::load(std::istream& in, std::ostream& out, const st
       out << "Do you want to save it (y/n): ";
       in >> ans;
     }
-
     if (ans == "y" || ans == "yes" || ans == "")
     {
       std::string newFileName;
@@ -33,26 +32,39 @@ void equalizer::cliEqualizer::load(std::istream& in, std::ostream& out, const st
   equalizer.openFile(name);
   fileName = name;
   isSaved = true;
-  out << "<TRACK WITH NAME " << name << " WAS SUCCESSFULLY LOADED>";
+  isLoaded = true;
+  out << "<TRACK WITH NAME " << name << " WAS SUCCESSFULLY LOADED>\n";
 }
 
-void equalizer::cliEqualizer::save(std::istream& in, std::ostream& out, const std::string& name)
+void equalizer::cliEqualizer::save(std::istream&, std::ostream& out, const std::string& name)
 {
+  if (!isLoaded)
+  {
+    out << "<THERE'S NO TRACK TO SAVE. PLEASE LOAD IT FIRST>\n";
+    return;
+  }
   equalizer.saveFile(name.empty() ? fileName : name);
   isSaved = true;
   out << "<THE TRACK WAS SUCCESSFULLY SAVED>\n";
 }
 
-void equalizer::cliEqualizer::rename(std::istream& in, std::ostream& out, const std::string& name)
+void equalizer::cliEqualizer::rename(std::istream&, std::ostream& out, const std::string& name)
 {
+  if (!isLoaded)
+  {
+    out << "<THERE'S NO TRACK TO RENAME. PLEASE LOAD IT FIRST>\n";
+    return;
+  }
   if (fileName == name)
   {
     return;
   }
   equalizer.renameFile(fileName, name);
-  fileName == name;
+  fileName = name;
   out << "<THE FILE WAS SUCCESSFULLY RENAMED>\n";
 }
+
+
 
 
 

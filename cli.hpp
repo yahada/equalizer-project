@@ -20,7 +20,8 @@ namespace equalizer
   private:
     std::string fileName;
     equalizer::Equalizer equalizer;
-    bool isSaved;
+    bool isLoaded = false;
+    bool isSaved = true;
   };
 }
 

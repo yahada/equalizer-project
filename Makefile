@@ -1,6 +1,6 @@
 CXXFLAGS += -Wall -Wextra -std=c++14 -MMD
 
-main: main.o filter.o equalizer.o wav_header.o
+main: main.o filter.o equalizer.o wav_header.o cli.o
 	$(CXX) $^ -o $@
 
 clean:

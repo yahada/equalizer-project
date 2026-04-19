@@ -21,6 +21,11 @@ void equalizer::Equalizer::StereoToMono()
   header_.byteRate_ = header_.sampleRate_ * header_.numChannels_ * header_.bitsPerSample_ / 8;
 }
 
+bool equalizer::Equalizer::getUiStatus() const noexcept
+{
+  return uiStatus;
+}
+
 void equalizer::Equalizer::openFile(const std::string& filename)
 {
   WavHeader header;

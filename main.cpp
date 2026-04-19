@@ -7,7 +7,5 @@ int main()
   eq.changeVolume(-1, 0, -1);
   eq.changeVolume(2, 0, 2);
 
-
-
   eq.saveFile("new.wav");
 }

@@ -26,11 +26,6 @@ bool equalizer::Equalizer::getUiStatus() const noexcept
   return uiStatus_;
 }
 
-bool equalizer::Equalizer::getMuteStatus() const noexcept
-{
-  return isMuted_;
-}
-
 void equalizer::Equalizer::openFile(const std::string& filename)
 {
   WavHeader header;

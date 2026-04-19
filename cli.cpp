@@ -84,7 +84,7 @@ void equalizer::cliEqualizer::mute(std::istream&, std::ostream& out)
     out << "<THERE'S NO TRACK TO MUTE. PLEASE LOAD IT FIRST>\n";
     return;
   }
-  if (!equalizer.getMuteStatus())
+  if (!equalizer.isMuted_)
   {
   equalizer.changeMuteStatus();
   isSaved = false;
@@ -102,7 +102,7 @@ void equalizer::cliEqualizer::unmute(std::istream&, std::ostream& out)
     return;
   }
 
-  if (equalizer.getMuteStatus())
+  if (equalizer.isMuted_)
   {
     equalizer.changeMuteStatus();
     isSaved = false;
@@ -133,6 +133,37 @@ void equalizer::cliEqualizer::inverse(std::istream&, std::ostream& out)
   equalizer.inversion();
   isSaved = false;
   out << "<THE TRACK WAS SUCCESSFULLY INVERSED>\n";
+}
+
+void equalizer::cliEqualizer::fromStereoToMono(std::istream&, std::ostream& out)
+{
+  if (!isLoaded)
+  {
+    out << "<THERE'S NO TRACK TO CONVERT. PLEASE LOAD IT FIRST>\n";
+    return;
+  }
+
+  if (equalizer.header_.numChannels_ == 1)
+  {
+    return;
+  }
+
+  equalizer.StereoToMono();
+  isSaved = false;
+  out << "<THE TRACK WAS SUCCESSFULLY CONVERTED FROM STEREO TO MONO>\n";
+}
+
+void equalizer::cliEqualizer::changeVolume(std::istream& in, std::ostream& out)
+{
+  if (!isLoaded)
+  {
+    out << "<THERE'S NO TRACK TO CHANGE VOLUME. PLEASE LOAD IT FIRST>\n";
+    return;
+  }
+
+  std::string params;
+  in >> params;
+
 }
 
 void equalizer::cliEqualizer::exit(std::istream& in, std::ostream& out)

@@ -12,7 +12,8 @@ namespace equalizer
     void renameFile(const std::string&, const std::string&);
     void showInfoAboutFile(std::ostream&) const;
     bool getUiStatus() const noexcept;
-    bool getMuteStatus() const noexcept;
+    // bool getMuteStatus() const noexcept;
+    // bool getChannelNumber() const noexcept;
     void cutFromLeft(const float& cutSize);
     void cutFromRight(const float& cutSize);
     void changeMuteStatus() noexcept;
@@ -22,6 +23,7 @@ namespace equalizer
     void inversion();
     void play();
   private:
+    friend class cliEqualizer;
     WavHeader header_;
     std::vector< int16_t > audioData_;
     std::vector< int16_t > changedAudioData_;

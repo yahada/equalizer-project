@@ -11,12 +11,15 @@ namespace equalizer
     void save(std::istream& in, std::ostream& out, const std::string& name);
     void rename(std::istream& in, std::ostream& out, const std::string& name);
 
-    void changeVolume(std::istream& in, std::ostream& out, const std::string& name);
-    void inverse(std::istream& in, std::ostream& out, const std::string& name);
-    void reverse(std::istream& in, std::ostream& out, const std::string& name);
-    void fromStereoToMono(std::istream& in, std::ostream& out, const std::string& name);
-    void mute(std::istream& in, std::ostream& out, const std::string& name);
-    void getInfo(std::istream& in, std::ostream& out, const std::string& name);
+    void changeVolume(std::istream& in, std::ostream& out);
+    void inverse(std::istream& in, std::ostream& out);
+    void reverse(std::istream& in, std::ostream& out);
+    void fromStereoToMono(std::istream& in, std::ostream& out);
+    void mute(std::istream& in, std::ostream& out);
+    void unmute(std::istream& in, std::ostream& out);
+    void getInfo(std::istream& in, std::ostream& out);
+
+    void exit(std::istream& in, std::ostream& out);
   private:
     std::string fileName;
     equalizer::Equalizer equalizer;

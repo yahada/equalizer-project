@@ -12,6 +12,7 @@ namespace equalizer
     void renameFile(const std::string&, const std::string&);
     void showInfoAboutFile(std::ostream&) const;
     bool getUiStatus() const noexcept;
+    bool getMuteStatus() const noexcept;
     void cutFromLeft(const float& cutSize);
     void cutFromRight(const float& cutSize);
     void changeMuteStatus() noexcept;
@@ -32,7 +33,7 @@ namespace equalizer
     float gainMid_ = 1.0f;
     float gainHigh_ = 1.0f;
     std::vector< float > convert();
-    bool uiStatus = false;
+    bool uiStatus_ = false;
   };
 }
 

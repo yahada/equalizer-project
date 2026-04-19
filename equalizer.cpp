@@ -23,7 +23,12 @@ void equalizer::Equalizer::StereoToMono()
 
 bool equalizer::Equalizer::getUiStatus() const noexcept
 {
-  return uiStatus;
+  return uiStatus_;
+}
+
+bool equalizer::Equalizer::getMuteStatus() const noexcept
+{
+  return isMuted_;
 }
 
 void equalizer::Equalizer::openFile(const std::string& filename)
@@ -45,6 +50,12 @@ void equalizer::Equalizer::openFile(const std::string& filename)
 
 void equalizer::Equalizer::saveFile(const std::string& filename)
 {
+  if (isMuted_)
+  {
+    std::vector< int16_t > tmpAudioData(changedAudioData_.size(), 0);
+    header_.saveWav(filename, tmpAudioData);
+    return;
+  }
   header_.saveWav(filename, changedAudioData_);
 }
 

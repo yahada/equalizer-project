@@ -1,5 +1,6 @@
 #include "cli.hpp"
 #include <algorithm>
+#include <sstream>
 #include <cctype>
 void equalizer::cliEqualizer::load(std::istream& in, std::ostream& out, const std::string& name)
 {
@@ -7,7 +8,6 @@ void equalizer::cliEqualizer::load(std::istream& in, std::ostream& out, const st
   {
     return;
   }
-
   if (!isSaved)
   {
     out << "<YOU HAVE AN UNSAVED TRACK>\n";
@@ -162,7 +162,89 @@ void equalizer::cliEqualizer::changeVolume(std::istream& in, std::ostream& out)
   }
 
   std::string params;
-  in >> params;
+  std::getline(in, params);
+  std::string item;
+  std::stringstream ss(params);
+  std::vector< std::string > splited_params;
+  while (std::getline(ss, item, ' '))
+  {
+    splited_params.push_back(item);
+  }
+  
+  if (splited_params.empty())
+  {
+    out << "<NO PARAMETERS FOUND. USE --help TO GET DESCRIPTION OF ALL POSSIBLE PARAMETERS YOU CAN ENTER>\n";
+    return;
+  }
+  if (splited_params[0] == "--help")
+  {
+    out << "ALL POSIBLE MODIFICATORS TO THIS COMMAND:\n";
+  }
+  float gain = 0.0;
+  try
+  {
+    gain = std::stof(splited_params[0]);
+  }
+  catch(...)
+  {
+    throw std::invalid_argument("First parametr must be integer");
+  }
+  if (gain < -200.0 || gain > 200.0)
+  {
+    throw std::invalid_argument("Volume gain must be in range [-200, 200]");
+  }
+  bool lowsFlag = false;
+  bool midFlag = false;
+  bool highFlag = false;
+  for (size_t i = 1; i < splited_params.size(); ++i)
+  {
+    if (splited_params[i][0] != '-')
+    {
+      std::string errorMsg = "Unknown parametr: '" + splited_params[i] + "'";
+      throw std::invalid_argument(errorMsg);
+    } else
+    {
+      for (size_t j = 1; j < splited_params[i].size(); ++j)
+      {
+        if (splited_params[i][j] != 'h' || splited_params[i][j] != 'm' || splited_params[i][j] != 'l')
+        {
+          std::string errorMsg = "Unknown modificator: '" + std::to_string(splited_params[i][j]) + "'";
+      throw std::invalid_argument(errorMsg);
+        } else
+        {
+          switch(splited_params[i][j])
+          {
+            case 'h':
+              highFlag = true;
+            case 'l':
+              lowsFlag = true;
+            case 'm':
+              midFlag = true;
+          }
+        }
+      }
+    }
+  }
+  if (highFlag || midFlag || lowsFlag == 0)
+  {
+    equalizer.changeVolume(gain / 100, gain / 100, gain / 100);
+    out << "<VOLUME WAS CHANGED SUCCESSFULLY>\n";
+    return;
+  }
+
+  if (lowsFlag)
+  {
+    equalizer.changeVolume(gain / 100, 0.0, 0.0);
+  }
+  if (midFlag)
+  {
+    equalizer.changeVolume(0.0, gain / 100, 0.0);
+  }
+  if (highFlag)
+  {
+    equalizer.changeVolume(0.0, 0.0, gain / 100);
+  }
+  out << "<VOLUME WAS CHANGED SUCCESSFULLY>\n";
 
 }
 

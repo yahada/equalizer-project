@@ -12,6 +12,7 @@ int main()
   cmdsNoName["unmute"] = &cliEqualizer::unmute;
   cmdsNoName["reverse"] = &cliEqualizer::reverse;
   cmdsNoName["inverse"] = &cliEqualizer::inverse;
+  cmdsNoName["volume"] = &cliEqualizer::changeVolume;
   cmdsNoName["exit"] = &cliEqualizer::exit;
 
 

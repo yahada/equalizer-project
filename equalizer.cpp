@@ -134,8 +134,20 @@ void equalizer::Equalizer::changeVolume(const float& lowFreqGain, const float& m
   equalizer::BiquadFilter lbf(equalizer::FilterTypeEnum::bq_type_lowpass, 200.0 / header_.sampleRate_, 0.707, 0);
   equalizer::BiquadFilter hbf(equalizer::FilterTypeEnum::bq_type_highpass, 3000.0 / header_.sampleRate_, 0.707, 0);
   gainLow_ += lowFreqGain;
+  if (gainLow_ > 2.0)
+  {
+    gainLow_ = 2.0;
+  }
   gainMid_ += midFreqGain;
+  if (gainMid_ > 2.0)
+  {
+    gainMid_ = 2.0;
+  }
   gainHigh_ += highFreqGain;
+  if (gainHigh_ > 2.0)
+  {
+    gainHigh_ = 2.0;
+  }
   for (size_t i = 0; i < audioData_.size(); ++i)
   {
     float lowFreqSample = lbf.process(convertedData[i]);

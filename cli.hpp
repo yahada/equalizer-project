@@ -5,7 +5,7 @@
 #include "equalizer.hpp"
 namespace equalizer
 {
-  struct cliEqualizer {
+  class cliEqualizer {
   public:
     void load(std::istream& in, std::ostream& out, const std::string& name);
     void save(std::istream& in, std::ostream& out, const std::string& name);

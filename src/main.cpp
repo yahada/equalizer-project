@@ -14,8 +14,6 @@ int main()
   cmdsNoName["inverse"] = &cliEqualizer::inverse;
   cmdsNoName["volume"] = &cliEqualizer::changeVolume;
   cmdsNoName["exit"] = &cliEqualizer::exit;
-
-
   using cmdWithName_t = void (cliEqualizer::*)(std::istream &, std::ostream &, const std::string&);
   std::unordered_map< std::string, cmdWithName_t > cmdWithName;
   cmdWithName["load"] = &cliEqualizer::load;

@@ -1,73 +1,76 @@
 #include "cli.hpp"
 #include <limits>
 #include <unordered_map>
+#include <sstream>
+
+std::vector< std::string > getSplitedParams(std::istream& in)
+{
+  std::string line;
+  std::getline(in, line);
+
+  std::stringstream ss(line);
+  std::vector<std::string> result;
+  std::string word;
+
+  while (ss >> word)
+  {
+    result.push_back(word);
+  }
+  return result;
+}
+
 int main()
 {
   using namespace equalizer;
   cliEqualizer cli;
-  using cmdNoName_t = void (cliEqualizer::*)(std::istream &, std::ostream &);
-  std::unordered_map< std::string, cmdNoName_t > cmdsNoName;
-  cmdsNoName["info"] = &cliEqualizer::getInfo;
-  cmdsNoName["mute"] = &cliEqualizer::mute;
-  cmdsNoName["unmute"] = &cliEqualizer::unmute;
-  cmdsNoName["reverse"] = &cliEqualizer::reverse;
-  cmdsNoName["inverse"] = &cliEqualizer::inverse;
-  cmdsNoName["volume"] = &cliEqualizer::changeVolume;
-  cmdsNoName["exit"] = &cliEqualizer::exit;
-  using cmdWithName_t = void (cliEqualizer::*)(std::istream &, std::ostream &, const std::string&);
-  std::unordered_map< std::string, cmdWithName_t > cmdWithName;
-  cmdWithName["load"] = &cliEqualizer::load;
-  cmdWithName["save"] = &cliEqualizer::save;
-  cmdWithName["rename"] = &cliEqualizer::rename;
+  using cmds_t = void (cliEqualizer::*)(std::istream&, std::ostream&, const std::vector< std::string >& params);
+  std::unordered_map< std::string, cmds_t > cmds;
+  cmds["load"] = &cliEqualizer::load;
+  cmds["save"] = &cliEqualizer::save;
+  cmds["rename"] = &cliEqualizer::rename;
+  // cmds["info"] = &cliEqualizer::getInfo;
+  // cmds["mute"] = &cliEqualizer::mute;
+  // cmds["unmute"] = &cliEqualizer::unmute;
+  // cmds["reverse"] = &cliEqualizer::reverse;
+  // cmds["inverse"] = &cliEqualizer::inverse;
+  // cmds["volume"] = &cliEqualizer::changeVolume;
+  // cmds["exit"] = &cliEqualizer::exit;
 
-  std::string cmd;
+  std::string line;
   while (!std::cin.eof())
   {
     std::cout << "> ";
-    std::cin >> cmd;
-
+    std::vector< std::string > splitedParams = getSplitedParams(std::cin);
     if (std::cin.eof())
     {
-      break;
+      std::cerr << "Bad input\n";
+      return 1;
     }
-
+    if (splitedParams.size() == 0)
+    {
+      continue;
+    }
+    std::string cmd = splitedParams[0];
     try
     {
-      cmdsNoName.at(cmd);
-      (cli.*cmdsNoName.at(cmd))(std::cin, std::cout);
+      cmds.at(cmd);
+      (cli.*cmds.at(cmd))(std::cin, std::cout, splitedParams);
     }
-    catch(...)
+    catch (const std::out_of_range&)
     {
-      try
-      {
-        cmdWithName.at(cmd);
-        std::string name;
-        std::cin >> name;
-        (cli.*cmdWithName.at(cmd))(std::cin, std::cout, name);
-      }
-      catch (const std::out_of_range&)
-      {
-        std::cerr << "<INVALID COMMAND>\n";
-
-        auto toignore = std::numeric_limits<std::streamsize>::max();
-        std::cin.ignore(toignore, '\n');
-      }
-      catch (const std::exception& e)
-      {
-        std::cerr << "<INVALID COMMAND: " << e.what() << " >\n";
-        auto toignore = std::numeric_limits<std::streamsize>::max();
-        std::cin.ignore(toignore, '\n');
-      }
+      std::cerr << "<INVALID COMMAND>\n";
+      // auto toignore = std::numeric_limits<std::streamsize>::max();
+      // std::cin.ignore(toignore, '\n');
+    }
+    catch (const std::exception& e)
+    {
+      std::cerr << "<INVALID COMMAND: " << e.what() << " >\n";
+      // auto toignore = std::numeric_limits<std::streamsize>::max();
+      // std::cin.ignore(toignore, '\n');
     }
     if (cmd == "exit")
     {
       return 0;
     }
-  }
-
-  if (std::cin.eof())
-  {
-    std::cerr << "Bad input\n";
-    return 1;
   }
 }

@@ -1,27 +1,28 @@
 #ifndef CLI
 #define CLI
 #include <string>
+#include <vector>
 #include <iostream>
 #include "equalizer.hpp"
 namespace equalizer
 {
   class cliEqualizer {
   public:
-    void load(std::istream& in, std::ostream& out, const std::string& name);
-    void save(std::istream& in, std::ostream& out, const std::string& name);
-
-    void rename(std::istream& in, std::ostream& out, const std::string& name);
-    void changeVolume(std::istream& in, std::ostream& out);
-    void inverse(std::istream& in, std::ostream& out);
-    void reverse(std::istream& in, std::ostream& out);
-    void fromStereoToMono(std::istream& in, std::ostream& out);
-    void mute(std::istream& in, std::ostream& out);
-    void unmute(std::istream& in, std::ostream& out);
-    void getInfo(std::istream& in, std::ostream& out);
-    void cutLeft(std::istream& in, std::ostream& out);
-    void cutRight(std::istream& in, std::ostream& out);
-    void exit(std::istream& in, std::ostream& out);
+    void load(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
+    void save(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
+    void rename(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
+    // void changeVolume(std::istream& in, std::ostream& out);
+    // void inverse(std::istream& in, std::ostream& out);
+    // void reverse(std::istream& in, std::ostream& out);
+    // void fromStereoToMono(std::istream& in, std::ostream& out);
+    // void mute(std::istream& in, std::ostream& out);
+    // void unmute(std::istream& in, std::ostream& out);
+    // void getInfo(std::istream& in, std::ostream& out);
+    // void cutLeft(std::istream& in, std::ostream& out);
+    // void cutRight(std::istream& in, std::ostream& out);
+    // void exit(std::istream& in, std::ostream& out);
   private:
+    std::vector< std::string > getSplitedParams(std::istream& in);
     std::string fileName;
     equalizer::Equalizer equalizer;
     bool isLoaded = false;

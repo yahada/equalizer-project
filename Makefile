@@ -3,7 +3,7 @@ CXXFLAGS += -Wall -Wextra -std=c++14 -MMD
 BUILD_DIR := lib
 SRC_DIR := src
 
-SRCS := $(addprefix $(SRC_DIR)/, main.cpp filter.cpp equalizer.cpp wav_header.cpp)
+SRCS := $(addprefix $(SRC_DIR)/, main.cpp filter.cpp equalizer.cpp wav_header.cpp cli.cpp)
 OBJS := $(SRCS:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
 

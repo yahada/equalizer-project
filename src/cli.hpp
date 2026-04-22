@@ -11,16 +11,16 @@ namespace equalizer
     void load(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
     void save(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
     void rename(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
-    // void changeVolume(std::istream& in, std::ostream& out);
-    // void inverse(std::istream& in, std::ostream& out);
-    // void reverse(std::istream& in, std::ostream& out);
-    // void fromStereoToMono(std::istream& in, std::ostream& out);
-    // void mute(std::istream& in, std::ostream& out);
-    // void unmute(std::istream& in, std::ostream& out);
-    // void getInfo(std::istream& in, std::ostream& out);
-    // void cutLeft(std::istream& in, std::ostream& out);
-    // void cutRight(std::istream& in, std::ostream& out);
-    // void exit(std::istream& in, std::ostream& out);
+    void getInfo(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
+    // void changeVolume(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
+    // void inverse(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
+    // void reverse(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
+    // void fromStereoToMono(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
+    // void mute(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
+    // void unmute(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
+    // void cutLeft(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
+    // void cutRight(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
+    // void exit(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
   private:
     std::vector< std::string > getSplitedParams(std::istream& in);
     std::string fileName;

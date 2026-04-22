@@ -28,7 +28,7 @@ int main()
   cmds["load"] = &cliEqualizer::load;
   cmds["save"] = &cliEqualizer::save;
   cmds["rename"] = &cliEqualizer::rename;
-  // cmds["info"] = &cliEqualizer::getInfo;
+  cmds["info"] = &cliEqualizer::getInfo;
   // cmds["mute"] = &cliEqualizer::mute;
   // cmds["unmute"] = &cliEqualizer::unmute;
   // cmds["reverse"] = &cliEqualizer::reverse;

@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <sstream>
 #include <cctype>
+#include <filesystem>
 
 void equalizer::cliEqualizer::load(std::istream&, std::ostream& out, const std::vector< std::string >& params)
 {
@@ -87,16 +88,52 @@ void equalizer::cliEqualizer::rename(std::istream&, std::ostream& out, const std
   out << "<THE FILE WAS SUCCESSFULLY RENAMED>\n";
 }
 
-// void equalizer::cliEqualizer::getInfo(std::istream&, std::ostream& out)
-// {
-//   if (!isLoaded)
-//   {
-//     out << "<THERE'S NO TRACK TO SHOW INFO ABOUT. PLEASE LOAD IT FIRST>\n";
-//     return;
-//   }
-//   out << "<INFO ABOUT FILE>\n";
-//   equalizer.showInfoAboutFile(out);
-// }
+void equalizer::cliEqualizer::getInfo(std::istream&, std::ostream& out, const std::vector< std::string >& params)
+{
+  if (!isLoaded)
+  {
+    throw std::invalid_argument("no file to get info about");
+  }
+  if (params.size() == 1)
+  {
+    out << "<INFO ABOUT FILE>\n";
+    out << "name: " << fileName << '\n';
+    equalizer.showInfoAboutFile(out);
+
+    return;
+  } else
+  {
+    if (params[1] == "-f")
+    {
+      std::string tmp = fileName.substr(0, fileName.size() - 4) + "_info.txt";
+      std::string res = tmp;
+      if (params.size() == 3)
+      {
+        size_t pos = fileName.find_last_of('/');
+        if (pos != std::string::npos)
+        {
+          res = tmp.substr(pos, tmp.size());
+        }
+        res = params[2] + res;
+      }
+      std::ofstream outfile(res);
+      if (!outfile)
+      {
+        throw std::invalid_argument("can't find directory with this path <" + res + ">");
+      }
+      outfile << "<INFO ABOUT FILE>\n";
+      outfile << "name: " << fileName << '\n';
+      equalizer.showInfoAboutFile(outfile);
+      out << "<SAVED TO: " << res << ">\n";
+      outfile.close();
+      return;
+    }
+    else
+    {
+      throw std::invalid_argument("unknown parametr <" + params[1] + ">");
+    }
+  }
+}
 
 // void equalizer::cliEqualizer::mute(std::istream&, std::ostream& out)
 // {

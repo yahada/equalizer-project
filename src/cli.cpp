@@ -332,19 +332,25 @@ void cli::changeVolume(std::istream&, std::ostream& out, const std::vector< std:
     return;
   }
 
+  float low = 0.0f;
+  float mid = 0.0f;
+  float high = 0.0f;
+
   if (lowsFlag)
   {
-    equalizer.changeVolume(gain / 100, 0.0, 0.0);
+    low = gain / 100;
   }
   if (midFlag)
   {
-    equalizer.changeVolume(0.0, gain / 100, 0.0);
+    mid = gain / 100;
   }
   if (highFlag)
   {
-    equalizer.changeVolume(0.0, 0.0, gain / 100);
+    high = gain / 100;
   }
-    cliEqualizer::success(out, "Volume updated\n");
+
+  equalizer.changeVolume(low, mid, high);
+  cliEqualizer::success(out, "Volume updated\n");
 }
 
 void cli::help(std::istream& in, std::ostream& out, const std::vector< std::string >& params)

@@ -18,8 +18,13 @@ namespace equalizer
     void inverse(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
     void fromStereoToMono(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
     void changeVolume(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
+    void help(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
     // void cutLeft(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
     // void cutRight(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
+    void success(std::ostream& out, const std::string& text);
+    std::string error(const std::string& text);
+    std::string warning(const std::string& text);
+    void printBanner(std::ostream& out);
     void exit(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
   private:
     std::vector< std::string > getSplitedParams(std::istream& in);

@@ -23,6 +23,7 @@ int main()
 {
   using namespace equalizer;
   cliEqualizer cli;
+  cli.printBanner(std::cout);
   using cmds_t = void (cliEqualizer::*)(std::istream&, std::ostream&, const std::vector< std::string >& params);
   std::unordered_map< std::string, cmds_t > cmds;
   cmds["load"] = &cliEqualizer::load;
@@ -34,6 +35,8 @@ int main()
   cmds["reverse"] = &cliEqualizer::reverse;
   cmds["inverse"] = &cliEqualizer::inverse;
   cmds["volume"] = &cliEqualizer::changeVolume;
+  cmds["help"] = &cliEqualizer::help;
+  cmds["convert"] = &cliEqualizer::changeVolume;
   // cmds["exit"] = &cliEqualizer::exit;
 
   std::string line;
@@ -58,12 +61,11 @@ int main()
     }
     catch (const std::out_of_range&)
     {
-      std::cerr << "<INVALID COMMAND>\n";
-
+      std::cerr << cli.error("Unknown command");
     }
     catch (const std::exception& e)
     {
-      std::cerr << "<INVALID COMMAND: " << e.what() << " >\n";
+      std::cerr << e.what();
     }
     if (cmd == "exit")
     {

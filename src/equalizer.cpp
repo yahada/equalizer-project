@@ -155,11 +155,14 @@ void equalizer::Equalizer::changeVolume(const float& lowFreqGain, const float& m
     float midFreqSample = (convertedData[i] - lowFreqSample - highFreqSample);
 
     lowFreqSample *= gainLow_;
-    highFreqSample *= gainMid_;
-    midFreqSample *= gainHigh_;
+    highFreqSample *= gainHigh_;
+    midFreqSample *= gainMid_;
 
     float resSample = (lowFreqSample + highFreqSample + midFreqSample) * 32768.0f;
-    changedAudioData[i] = resSample > 32767 ? 32767 : resSample;
+    if (resSample > 32767) resSample = 32767;
+    if (resSample < -32768) resSample = -32768;
+
+    changedAudioData[i] = static_cast<int16_t>(resSample);
   }
   changedAudioData_ = changedAudioData;
 }

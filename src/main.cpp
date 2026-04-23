@@ -29,11 +29,11 @@ int main()
   cmds["save"] = &cliEqualizer::save;
   cmds["rename"] = &cliEqualizer::rename;
   cmds["info"] = &cliEqualizer::getInfo;
-  // cmds["mute"] = &cliEqualizer::mute;
-  // cmds["unmute"] = &cliEqualizer::unmute;
-  // cmds["reverse"] = &cliEqualizer::reverse;
-  // cmds["inverse"] = &cliEqualizer::inverse;
-  // cmds["volume"] = &cliEqualizer::changeVolume;
+  cmds["mute"] = &cliEqualizer::mute;
+  cmds["unmute"] = &cliEqualizer::unmute;
+  cmds["reverse"] = &cliEqualizer::reverse;
+  cmds["inverse"] = &cliEqualizer::inverse;
+  cmds["volume"] = &cliEqualizer::changeVolume;
   // cmds["exit"] = &cliEqualizer::exit;
 
   std::string line;
@@ -59,14 +59,11 @@ int main()
     catch (const std::out_of_range&)
     {
       std::cerr << "<INVALID COMMAND>\n";
-      // auto toignore = std::numeric_limits<std::streamsize>::max();
-      // std::cin.ignore(toignore, '\n');
+
     }
     catch (const std::exception& e)
     {
       std::cerr << "<INVALID COMMAND: " << e.what() << " >\n";
-      // auto toignore = std::numeric_limits<std::streamsize>::max();
-      // std::cin.ignore(toignore, '\n');
     }
     if (cmd == "exit")
     {

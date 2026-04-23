@@ -4,7 +4,7 @@
 #include <cctype>
 #include <filesystem>
 
-void equalizer::cliEqualizer::load(std::istream&, std::ostream& out, const std::vector< std::string >& params)
+void equalizer::cliEqualizer::load(std::istream& in, std::ostream& out, const std::vector< std::string >& params)
 {
   if (params.size() == 1)
   {
@@ -19,28 +19,29 @@ void equalizer::cliEqualizer::load(std::istream&, std::ostream& out, const std::
   {
     return;
   }
-  // if (!isSaved)
-  // {
-  //   out << "<YOU HAVE AN UNSAVED TRACK>\n";
-  //   out << "Do you want to save it (y/n): ";
-  //   std::string ans;
-  //   in >> ans;
-  //   std::transform(ans.begin(), ans.end(), ans.begin(), tolower);
-  //   while (ans != "y" && ans != "yes" && ans != "n" && ans != "no")
-  //   {
-  //     out << "<WRONG INPUT>\n";
-  //     out << "Do you want to save it (y/n): ";
-  //     in >> ans;
-  //   }
-  //   if (ans == "y" || ans == "yes")
-  //   {
-  //     std::string newFileName;
-  //     out << "Enter new name of the file: ";
-  //     in >> newFileName;
-  //     equalizer::cliEqualizer::save(in, out, newFileName);
-  //     return;
-  //   }
-  // }
+  if (!isSaved)
+  {
+    out << "<YOU HAVE AN UNSAVED TRACK>\n";
+    out << "Do you want to save it (y/n): ";
+    std::string ans;
+    in >> ans;
+    std::transform(ans.begin(), ans.end(), ans.begin(), tolower);
+    while (ans != "y" && ans != "yes" && ans != "n" && ans != "no")
+    {
+      out << "<WRONG INPUT>\n";
+      out << "Do you want to save it (y/n): ";
+      in >> ans;
+    }
+    if (ans == "y" || ans == "yes")
+    {
+      std::string newFileName;
+      out << "Enter new name of the file: ";
+      in >> newFileName;
+      std::vector< std::string > tmpParams = {0, newFileName};
+      equalizer::cliEqualizer::save(in, out, tmpParams);
+      return;
+    }
+  }
   equalizer.openFile(name);
   fileName = name;
   isSaved = true;
@@ -135,205 +136,178 @@ void equalizer::cliEqualizer::getInfo(std::istream&, std::ostream& out, const st
   }
 }
 
-// void equalizer::cliEqualizer::mute(std::istream&, std::ostream& out)
-// {
-//   if (!isLoaded)
-//   {
-//     out << "<THERE'S NO TRACK TO MUTE. PLEASE LOAD IT FIRST>\n";
-//     return;
-//   }
-//   if (!equalizer.isMuted_)
-//   {
-//   equalizer.changeMuteStatus();
-//   isSaved = false;
+void equalizer::cliEqualizer::mute(std::istream&, std::ostream& out, const std::vector< std::string >&)
+{
+  if (!isLoaded)
+  {
+    throw std::invalid_argument("no track to mute");
+  }
+  if (!equalizer.isMuted_)
+  {
+  equalizer.changeMuteStatus();
+  isSaved = false;
+  }
+  out << "<THE TRACK WAS SUCCESSFULLY MUTED>\n";
+}
 
-//   }
-//   out << "<THE TRACK WAS SUCCESSFULLY MUTED>\n";
+void equalizer::cliEqualizer::unmute(std::istream&, std::ostream& out, const std::vector< std::string >&)
+{
+  if (!isLoaded)
+  {
+    throw std::invalid_argument("no track to unmute");
+  }
 
-// }
+  if (equalizer.isMuted_)
+  {
+    equalizer.changeMuteStatus();
+    isSaved = false;
+  }
+  out << "<THE TRACK WAS SUCCESSFULLY UNMUTED>\n";
+}
 
-// void equalizer::cliEqualizer::unmute(std::istream&, std::ostream& out)
-// {
-//   if (!isLoaded)
-//   {
-//     out << "<THERE'S NO TRACK TO MUTE. PLEASE LOAD IT FIRST>\n";
-//     return;
-//   }
+void equalizer::cliEqualizer::reverse(std::istream&, std::ostream& out, const std::vector< std::string >&)
+{
+  if (!isLoaded)
+  {
+    throw std::invalid_argument("no track to reverse");
+  }
 
-//   if (equalizer.isMuted_)
-//   {
-//     equalizer.changeMuteStatus();
-//     isSaved = false;
-//   }
-//   out << "<THE TRACK WAS SUCCESSFULLY UNMUTED>\n";
-// }
+  equalizer.reverse();
+  isSaved = false;
+  out << "<THE TRACK WAS SUCCESSFULLY REVERSED>\n";
+}
 
-// void equalizer::cliEqualizer::reverse(std::istream&, std::ostream& out)
-// {
-//   if (!isLoaded)
-//   {
-//     out << "<THERE'S NO TRACK TO REVERSE. PLEASE LOAD IT FIRST>\n";
-//     return;
-//   }
+void equalizer::cliEqualizer::inverse(std::istream&, std::ostream& out, const std::vector< std::string >&)
+{
+  if (!isLoaded)
+  {
+    throw std::invalid_argument("no track to inverse");
+  }
+  equalizer.inversion();
+  isSaved = false;
+  out << "<THE TRACK WAS SUCCESSFULLY INVERSED>\n";
+}
 
-//   equalizer.reverse();
-//   isSaved = false;
-//   out << "<THE TRACK WAS SUCCESSFULLY REVERSED>\n";
-// }
+void equalizer::cliEqualizer::fromStereoToMono(std::istream&, std::ostream& out, const std::vector< std::string >&)
+{
+  if (!isLoaded)
+  {
+    throw std::invalid_argument("no track to convert from stereo to mono");
+  }
 
-// void equalizer::cliEqualizer::inverse(std::istream&, std::ostream& out)
-// {
-//   if (!isLoaded)
-//   {
-//     out << "<THERE'S NO TRACK TO INVERSED. PLEASE LOAD IT FIRST>\n";
-//     return;
-//   }
-//   equalizer.inversion();
-//   isSaved = false;
-//   out << "<THE TRACK WAS SUCCESSFULLY INVERSED>\n";
-// }
+  if (equalizer.header_.numChannels_ == 1)
+  {
+    throw std::invalid_argument("track already in mono format");
+  }
+  equalizer.StereoToMono();
+  isSaved = false;
 
-// void equalizer::cliEqualizer::fromStereoToMono(std::istream&, std::ostream& out)
-// {
-//   if (!isLoaded)
-//   {
-//     out << "<THERE'S NO TRACK TO CONVERT. PLEASE LOAD IT FIRST>\n";
-//     return;
-//   }
+  out << "<THE TRACK WAS SUCCESSFULLY CONVERTED FROM STEREO TO MONO>\n";
+}
 
-//   if (equalizer.header_.numChannels_ == 1)
-//   {
-//     return;
-//   }
+void equalizer::cliEqualizer::changeVolume(std::istream&, std::ostream& out, const std::vector< std::string >& params)
+{
+  if (!isLoaded)
+  {
+    throw std::invalid_argument("no track to change volume");
+  }
 
-//   equalizer.StereoToMono();
-//   isSaved = false;
-//   out << "<THE TRACK WAS SUCCESSFULLY CONVERTED FROM STEREO TO MONO>\n";
-// }
+  if (params.size() == 1)
+  {
+    throw std::invalid_argument("no parametrs found. Use --help for more information");
+  }
 
-// void equalizer::cliEqualizer::changeVolume(std::istream& in, std::ostream& out)
-// {
-//   if (!isLoaded)
-//   {
-//     out << "<THERE'S NO TRACK TO CHANGE VOLUME. PLEASE LOAD IT FIRST>\n";
-//     return;
-//   }
+  if (params[1] == "--help")
+  {
+    out << "COMMANDS\n";
+    return;
+  }
 
-//   std::string params;
-//   std::getline(in, params);
-//   std::string item;
-//   std::stringstream ss(params);
-//   std::vector< std::string > splited_params;
-//   while (std::getline(ss, item, ' '))
-//   {
-//     splited_params.push_back(item);
-//   }
-  
-//   if (splited_params.empty())
-//   {
-//     out << "<NO PARAMETERS FOUND. USE --help TO GET DESCRIPTION OF ALL POSSIBLE PARAMETERS YOU CAN ENTER>\n";
-//     return;
-//   }
-//   if (splited_params[0] == "--help")
-//   {
-//     out << "ALL POSIBLE MODIFICATORS TO THIS COMMAND:\n";
-//   }
-//   float gain = 0.0;
-//   try
-//   {
-//     gain = std::stof(splited_params[0]);
-//   }
-//   catch(...)
-//   {
-//     throw std::invalid_argument("First parametr must be integer");
-//   }
-//   if (gain < -200.0 || gain > 200.0)
-//   {
-//     throw std::invalid_argument("Volume gain must be in range [-200, 200]");
-//   }
-//   bool lowsFlag = false;
-//   bool midFlag = false;
-//   bool highFlag = false;
-//   for (size_t i = 1; i < splited_params.size(); ++i)
-//   {
-//     if (splited_params[i][0] != '-')
-//     {
-//       std::string errorMsg = "Unknown parametr: '" + splited_params[i] + "'";
-//       throw std::invalid_argument(errorMsg);
-//     } else
-//     {
-//       for (size_t j = 1; j < splited_params[i].size(); ++j)
-//       {
-//         if (splited_params[i][j] != 'h' || splited_params[i][j] != 'm' || splited_params[i][j] != 'l')
-//         {
-//           std::string errorMsg = "Unknown modificator: '" + std::to_string(splited_params[i][j]) + "'";
-//       throw std::invalid_argument(errorMsg);
-//         } else
-//         {
-//           switch(splited_params[i][j])
-//           {
-//             case 'h':
-//               highFlag = true;
-//             case 'l':
-//               lowsFlag = true;
-//             case 'm':
-//               midFlag = true;
-//           }
-//         }
-//       }
-//     }
-//   }
-//   if (highFlag || midFlag || lowsFlag == 0)
-//   {
-//     equalizer.changeVolume(gain / 100, gain / 100, gain / 100);
-//     out << "<VOLUME WAS CHANGED SUCCESSFULLY>\n";
-//     return;
-//   }
+  float gain = 0.0;
+  try
+  {
+    gain = std::stof(params[1]);
+  }
+  catch(...)
+  {
+    throw std::invalid_argument("first parametr must be integer");
+  }
 
-//   if (lowsFlag)
-//   {
-//     equalizer.changeVolume(gain / 100, 0.0, 0.0);
-//   }
-//   if (midFlag)
-//   {
-//     equalizer.changeVolume(0.0, gain / 100, 0.0);
-//   }
-//   if (highFlag)
-//   {
-//     equalizer.changeVolume(0.0, 0.0, gain / 100);
-//   }
-//   out << "<VOLUME WAS CHANGED SUCCESSFULLY>\n";
+  if (gain < -200.0 || gain > 200.0)
+  {
+    throw std::invalid_argument("volume gain must be in range [-200, 200]");
+  }
 
-// }
+  bool lowsFlag = false;
+  bool midFlag = false;
+  bool highFlag = false;
+  for (size_t i = 2; i < params.size(); ++i)
+  {
+    if (params[i] == "--help")
+    {
+      out << "COMMANDS\n";
+      return;
+    }
 
-// void equalizer::cliEqualizer::exit(std::istream& in, std::ostream& out)
-// {
-//   if (!isSaved)
-//   {
-//     out << "<YOU HAVE AN UNSAVED TRACK>\n";
-//     out << "Do you want to save it (y/n): ";
-//     std::string ans;
-//     in >> ans;
-//     std::transform(ans.begin(), ans.end(), ans.begin(), tolower);
-//     while (ans != "y" && ans != "yes" && ans != "n" && ans != "no")
-//     {
-//       out << "<WRONG INPUT>\n";
-//       out << "Do you want to save it (y/n): ";
-//       in >> ans;
-//     }
-//     if (ans == "y" || ans == "yes")
-//     {
-//       std::string newFileName;
-//       out << "Enter new name of the file: ";
-//       in >> newFileName;
-//       equalizer::cliEqualizer::save(in, out, newFileName);
-//       return;
-//     }
-//   } else
-//   {
-//     return;
-//   }
-// }
+    if (params[i] != "-h" && params[i] != "-m" && params[i] != "-l")
+    {
+      throw std::invalid_argument("unknown parametr <" + params[i] + ">");
+    }
+    switch(params[i][1])
+    {
+      case 'h': highFlag = true;
+      case 'm': midFlag = true;
+      case 'l': lowsFlag = true;
+    }
+  }
+  if (highFlag || midFlag || lowsFlag == 0)
+  {
+    equalizer.changeVolume(gain / 100, gain / 100, gain / 100);
+    out << "<VOLUME WAS CHANGED SUCCESSFULLY>\n";
+    return;
+  }
+
+  if (lowsFlag)
+  {
+    equalizer.changeVolume(gain / 100, 0.0, 0.0);
+  }
+  if (midFlag)
+  {
+    equalizer.changeVolume(0.0, gain / 100, 0.0);
+  }
+  if (highFlag)
+  {
+    equalizer.changeVolume(0.0, 0.0, gain / 100);
+  }
+  out << "<VOLUME WAS CHANGED SUCCESSFULLY>\n";
+}
+
+void equalizer::cliEqualizer::exit(std::istream& in, std::ostream& out, const std::vector< std::string >& params)
+{
+  if (!isSaved)
+  {
+    out << "<YOU HAVE AN UNSAVED TRACK>\n";
+    out << "Do you want to save it (y/n): ";
+    std::string ans;
+    in >> ans;
+    std::transform(ans.begin(), ans.end(), ans.begin(), tolower);
+    while (ans != "y" && ans != "yes" && ans != "n" && ans != "no")
+    {
+      out << "<WRONG INPUT>\n";
+      out << "Do you want to save it (y/n): ";
+      in >> ans;
+    }
+    if (ans == "y" || ans == "yes")
+    {
+      std::string newFileName;
+      out << "Enter new name of the file: ";
+      in >> newFileName;
+      std::vector< std::string > tmpParams = {0, newFileName};
+      equalizer::cliEqualizer::save(in, out, tmpParams);
+      return;
+    }
+  }
+}
 
 
 

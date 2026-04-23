@@ -21,9 +21,24 @@ void equalizer::Equalizer::StereoToMono()
   header_.byteRate_ = header_.sampleRate_ * header_.numChannels_ * header_.bitsPerSample_ / 8;
 }
 
-bool equalizer::Equalizer::getUiStatus() const noexcept
+void equalizer::Equalizer::getSettings(std::ostream& out) const
 {
-  return uiStatus_;
+  out << "Muted status: " << (isMuted_ ? "Muted" : "Unmuted") << '\n';
+  out << "Low frequencies volume: " << gainLow_ * 100 << "%\n";
+  out << "Mid frequencies volume: " << gainMid_ * 100 << "%\n";
+  out << "High frequencies volume: " << gainHigh_ * 100 << "%\n";
+  out << "Cut from the left: " << leftCut_ << "sec\n";
+  out << "Cut from the right: " << rightCut_ << "sec\n";
+}
+
+void equalizer::Equalizer::loadSettings(bool mutedStatus, float gainLow, float gainMid, float gainHigh, float cutLeft, float cutRight)
+{
+  isMuted_ = mutedStatus;
+  gainLow_ = gainLow;
+  gainMid_ = gainMid;
+  gainLow_ = gainLow;
+  leftCut_ = cutLeft;
+  rightCut_ = cutRight;
 }
 
 void equalizer::Equalizer::openFile(const std::string& filename)
@@ -37,7 +52,7 @@ void equalizer::Equalizer::openFile(const std::string& filename)
 
   isMuted_ = false;
   leftCut_ = 0.0f;
-  RightCut_ = 0.0f;
+  rightCut_ = 0.0f;
   gainLow_ = 1.0f;
   gainMid_ = 1.0f;
   gainHigh_ = 1.0f;
@@ -119,7 +134,7 @@ void equalizer::Equalizer::cutFromLeft(const float& cutSize)
 
 void equalizer::Equalizer::cutFromRight(const float& cutSize)
 {
-  RightCut_ = cutSize;
+  rightCut_ = cutSize;
 }
 
 void equalizer::Equalizer::changeMuteStatus() noexcept
@@ -137,16 +152,25 @@ void equalizer::Equalizer::changeVolume(const float& lowFreqGain, const float& m
   if (gainLow_ > 2.0)
   {
     gainLow_ = 2.0;
+  } else if (gainLow_ < 0)
+  {
+    gainLow_ = 0.0;
   }
   gainMid_ += midFreqGain;
   if (gainMid_ > 2.0)
   {
     gainMid_ = 2.0;
+  } else if (gainMid_ < 0)
+  {
+    gainMid_ = 0.0;
   }
   gainHigh_ += highFreqGain;
   if (gainHigh_ > 2.0)
   {
     gainHigh_ = 2.0;
+  } else if (gainHigh_ < 0)
+  {
+    gainHigh_ = 0.0;
   }
   for (size_t i = 0; i < audioData_.size(); ++i)
   {
@@ -162,7 +186,7 @@ void equalizer::Equalizer::changeVolume(const float& lowFreqGain, const float& m
     if (resSample > 32767) resSample = 32767;
     if (resSample < -32768) resSample = -32768;
 
-    changedAudioData[i] = static_cast<int16_t>(resSample);
+    changedAudioData[i] = static_cast< int16_t >(resSample);
   }
   changedAudioData_ = changedAudioData;
 }

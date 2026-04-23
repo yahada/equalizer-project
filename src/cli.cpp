@@ -163,7 +163,7 @@ void cli::getInfo(std::istream&, std::ostream& out, const std::vector< std::stri
       std::ofstream outfile(res);
       if (!outfile)
       {
-        throw std::invalid_argument("can't find directory with this path <" + res + ">");
+        throw std::invalid_argument(cli::error("Can't find directory with this path: " + res));
       }
       outfile << "<Info about file\n";
       outfile << "name: " << fileName << '\n';
@@ -262,32 +262,28 @@ void cli::changeVolume(std::istream&, std::ostream& out, const std::vector< std:
 
   if (params[1] == "--help")
   {
-    out << R"(
-VOLUME COMMAND
-
-Usage:
-volume <gain> [-l] [-m] [-h]
-
-Description:
-  Changes volume of the track.
-
-Arguments:
-  <gain>        Volume change in percent (-200 to 200)
-
-Options:
-  -l            Apply to low frequencies
-  -m            Apply to mid frequencies
-  -h            Apply to high frequencies
-
-Behavior:
-  If no flags are specified, volume is applied to all frequencies.
-
-Examples:
-  volume 50           Increase overall volume by 50%
-  volume -30          Decrease overall volume by 30%
-  volume 20 -l        Boost low frequencies
-  volume 10 -m -h     Boost mid and high frequencies
-)";
+    out << "\n";
+    out << "VOLUME COMMAND\n";
+    out << "Usage:\n";
+    out << "  volume <gain> [-l] [-m] [-h]\n";
+    out << "\n";
+    out << "Arguments:\n";
+    out << "  <gain>        Volume change in percent [-200 to 200]\n";
+    out << "\n";
+    out << "Options:\n";
+    out << "  -l            Apply to low frequencies\n";
+    out << "  -m            Apply to mid frequencies\n";
+    out << "  -h            Apply to high frequencies\n";
+    out << "\n";
+    out << "Behavior:\n";
+    out << "  If no flags are specified, volume is applied to all frequencies.\n";
+    out << "\n";
+    out << "Examples:\n";
+    out << "  volume 50           Increase overall volume by 50%\n";
+    out << "  volume -30          Decrease overall volume by 30%\n";
+    out << "  volume 20 -l        Boost low frequencies\n";
+    out << "  volume 10 -m -h     Boost mid and high frequencies\n";
+    out << "\n";
     return;
   }
 
@@ -332,7 +328,7 @@ Examples:
   if (!highFlag && !midFlag && !lowsFlag)
   {
     equalizer.changeVolume(gain / 100, gain / 100, gain / 100);
-    cliEqualizer::success(out, "Track's volume was changed\n");
+    cliEqualizer::success(out, "Volume updated\n");
     return;
   }
 
@@ -348,7 +344,7 @@ Examples:
   {
     equalizer.changeVolume(0.0, 0.0, gain / 100);
   }
-    cliEqualizer::success(out, "Track's volume was changed\n");
+    cliEqualizer::success(out, "Volume updated\n");
 }
 
 void cli::help(std::istream& in, std::ostream& out, const std::vector< std::string >& params)
@@ -362,8 +358,52 @@ void cli::help(std::istream& in, std::ostream& out, const std::vector< std::stri
   out << "reverse                       - reverse audio\n";
   out << "inverse                       - invert waveform\n";
   out << "convert                       - convert stereo to mono\n";
-  out << "volume <gain> [-l] [-m] [-h]\n    - change volume";
+  out << "volume <gain> [-l] [-m] [-h]  - change volume\n";
   out << "exit                          - exit program\n";
+}
+
+void cli::settings(std::istream& in, std::ostream& out, const std::vector< std::string >& params)
+{
+  if (!isLoaded)
+  {
+    throw std::invalid_argument(cli::error("Can't find track to get settings"));
+  }
+  if (params.size() == 1)
+  {
+    out << "Track settings\n";
+    equalizer.getSettings(out);
+    return;
+  } else
+  {
+    if (params[1] == "-f")
+    {
+      std::string tmp = fileName.substr(0, fileName.size() - 4) + "_settings.txt";
+      std::string res = tmp;
+      if (params.size() == 3)
+      {
+        size_t pos = fileName.find_last_of('/');
+        if (pos != std::string::npos)
+        {
+          res = tmp.substr(pos, tmp.size());
+        }
+        res = params[2] + res;
+      }
+      std::ofstream outfile(res);
+      if (!outfile)
+      {
+        throw std::invalid_argument(cli::error("Can't find directory with this path: " + res));
+      }
+      outfile << "Track settings\n";
+      equalizer.getSettings(outfile);
+      cli::success(out, "Saved to file: " + fileName);
+      outfile.close();
+      return;
+    }
+    else
+    {
+      throw std::invalid_argument(cli::warning("Unknown parametr: " + params[1]));
+    }
+  }
 }
 
 
@@ -371,14 +411,14 @@ void cli::exit(std::istream& in, std::ostream& out, const std::vector< std::stri
 {
   if (!isSaved)
   {
-    out << "<YOU HAVE AN UNSAVED TRACK>\n";
+    out << cli::warning("You have unsaved file: " + fileName);
     out << "Do you want to save it (y/n): ";
     std::string ans;
     in >> ans;
     std::transform(ans.begin(), ans.end(), ans.begin(), tolower);
     while (ans != "y" && ans != "yes" && ans != "n" && ans != "no")
     {
-      out << "<WRONG INPUT>\n";
+      out << cli::error("Wrong input");
       out << "Do you want to save it (y/n): ";
       in >> ans;
     }

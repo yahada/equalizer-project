@@ -19,6 +19,8 @@ namespace equalizer
     void fromStereoToMono(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
     void changeVolume(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
     void help(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
+    void settings(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
+    void loadSettings(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
     // void cutLeft(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
     // void cutRight(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
     void success(std::ostream& out, const std::string& text);

@@ -37,7 +37,8 @@ int main()
   cmds["volume"] = &cliEqualizer::changeVolume;
   cmds["help"] = &cliEqualizer::help;
   cmds["convert"] = &cliEqualizer::changeVolume;
-  // cmds["exit"] = &cliEqualizer::exit;
+  cmds["settings"] = &cliEqualizer::settings;
+  cmds["exit"] = &cliEqualizer::exit;
 
   std::string line;
   while (!std::cin.eof())

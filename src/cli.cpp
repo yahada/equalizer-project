@@ -262,7 +262,32 @@ void cli::changeVolume(std::istream&, std::ostream& out, const std::vector< std:
 
   if (params[1] == "--help")
   {
-    out << "COMMANDS\n";
+    out << R"(
+VOLUME COMMAND
+
+Usage:
+volume <gain> [-l] [-m] [-h]
+
+Description:
+  Changes volume of the track.
+
+Arguments:
+  <gain>        Volume change in percent (-200 to 200)
+
+Options:
+  -l            Apply to low frequencies
+  -m            Apply to mid frequencies
+  -h            Apply to high frequencies
+
+Behavior:
+  If no flags are specified, volume is applied to all frequencies.
+
+Examples:
+  volume 50           Increase overall volume by 50%
+  volume -30          Decrease overall volume by 30%
+  volume 20 -l        Boost low frequencies
+  volume 10 -m -h     Boost mid and high frequencies
+)";
     return;
   }
 
@@ -286,11 +311,6 @@ void cli::changeVolume(std::istream&, std::ostream& out, const std::vector< std:
   bool highFlag = false;
   for (size_t i = 2; i < params.size(); ++i)
   {
-    if (params[i] == "--help")
-    {
-      out << "COMMANDS\n";
-      return;
-    }
 
     if (params[i] != "-h" && params[i] != "-m" && params[i] != "-l")
     {
@@ -342,7 +362,7 @@ void cli::help(std::istream& in, std::ostream& out, const std::vector< std::stri
   out << "reverse                       - reverse audio\n";
   out << "inverse                       - invert waveform\n";
   out << "convert                       - convert stereo to mono\n";
-  out << "volume <gain> [-l -m -h]\n    - change volume";
+  out << "volume <gain> [-l] [-m] [-h]\n    - change volume";
   out << "exit                          - exit program\n";
 }
 

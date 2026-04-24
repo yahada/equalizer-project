@@ -38,6 +38,8 @@ int main()
   cmds["help"] = &cliEqualizer::help;
   cmds["convert"] = &cliEqualizer::changeVolume;
   cmds["settings"] = &cliEqualizer::settings;
+  cmds["reset"] = &cliEqualizer::reset;
+  cmds["loadSet"] = &cliEqualizer::getSettings;
   cmds["exit"] = &cliEqualizer::exit;
 
   std::string line;

@@ -8,7 +8,7 @@ using cli = equalizer::cliEqualizer;
 void cli::printBanner(std::ostream& out)
 {
   out << R"(
-███████╗ ██████╗ ██╗   ██╗ █████╗ ██╗     ██╗███████╗███████╗██████╗ 
+███████╗ ██████╗ ██╗   ██╗ █████╗ ██╗     ██╗███████╗███████╗██████╗
 ██╔════╝██╔═══██╗██║   ██║██╔══██╗██║     ██║╚══███╔╝██╔════╝██╔══██╗
 █████╗  ██║   ██║██║   ██║███████║██║     ██║  ███╔╝ █████╗  ██████╔╝
 ██╔══╝  ██║▄▄ ██║██║   ██║██╔══██║██║     ██║ ███╔╝  ██╔══╝  ██╔══██╗
@@ -83,7 +83,7 @@ void cli::load(std::istream& in, std::ostream& out, const std::vector< std::stri
   {
     throw std::invalid_argument(cli::error(e.what()));
   }
-  
+
   fileName = name;
   isSaved = true;
   isLoaded = true;
@@ -274,17 +274,18 @@ void cli::changeVolume(std::istream&, std::ostream& out, const std::vector< std:
     out << "  -l            Apply to low frequencies\n";
     out << "  -m            Apply to mid frequencies\n";
     out << "  -h            Apply to high frequencies\n";
+    out << "  reset         Reset all gains\n";
     out << "\n";
     out << "Behavior:\n";
     out << "  If no flags are specified, volume is applied to all frequencies.\n";
-    out << "\n";
-    out << "Examples:\n";
-    out << "  volume 50           Increase overall volume by 50%\n";
-    out << "  volume -30          Decrease overall volume by 30%\n";
-    out << "  volume 20 -l        Boost low frequencies\n";
-    out << "  volume 10 -m -h     Boost mid and high frequencies\n";
-    out << "\n";
     return;
+  }
+
+  if (params[1] == "reset")
+  {
+    equalizer.gainLow_ = 1.0;
+    equalizer.gainMid_ = 1.0;
+    equalizer.gainHigh_ = 1.0;
   }
 
   float gain = 0.0;
@@ -310,7 +311,7 @@ void cli::changeVolume(std::istream&, std::ostream& out, const std::vector< std:
 
     if (params[i] != "-h" && params[i] != "-m" && params[i] != "-l")
     {
-      throw std::invalid_argument(cli::error("Unknown parametr: " + params[i]));
+      throw std::invalid_argument(cli::error("Unknown option: " + params[i]));
     }
     switch(params[i][1])
     {
@@ -350,6 +351,7 @@ void cli::changeVolume(std::istream&, std::ostream& out, const std::vector< std:
   }
 
   equalizer.changeVolume(low, mid, high);
+  isSaved = false;
   cliEqualizer::success(out, "Volume updated");
 }
 
@@ -359,12 +361,15 @@ void cli::help(std::istream& in, std::ostream& out, const std::vector< std::stri
   out << "load <file>                   - load audio file\n";
   out << "save [-f file]                - save audio\n";
   out << "rename <name>                 - rename file\n";
-  out << "info [-f [path]]              - show or export info\n";
+  out << "info [-f [path]]              - show info export it to the file\n";
   out << "mute / unmute                 - toggle sound\n";
   out << "reverse                       - reverse audio\n";
   out << "inverse                       - invert waveform\n";
   out << "convert                       - convert stereo to mono\n";
   out << "volume <gain> [-l] [-m] [-h]  - change volume\n";
+  out << "setting [-f]                  - show settings or export it to the file\n";
+  out << "loadSet <file>                - load settings from file\n";
+  out << "reset                         - reset all settings\n";
   out << "exit                          - exit program\n";
 }
 
@@ -412,8 +417,96 @@ void cli::settings(std::istream& in, std::ostream& out, const std::vector< std::
   }
 }
 
+float cli::extractFloat(const std::string& line)
+{
+  size_t pos = line.find(':');
+  if (pos == std::string::npos)
+  {
+    return 0.0f;
+  }
+  std::string numStr = line.substr(pos + 1);
+  numStr.erase(std::remove(numStr.begin(), numStr.end(), '%'), numStr.end());
+  size_t secPos = numStr.find("sec");
+  if (secPos != std::string::npos)
+  {
+    numStr.erase(secPos, 3);
+  }
+  try
+  {
+    return std::stof(numStr);
+  }
+  catch (...)
+  {
+    return 0.0f;
+  }
+}
 
-void cli::exit(std::istream& in, std::ostream& out, const std::vector< std::string >& params)
+void cli::getSettings(std::istream&, std::ostream& out, const std::vector< std::string >& params)
+{
+  if (!isLoaded)
+  {
+    throw std::invalid_argument(cli::error("Can't find track to set settings"));
+  }
+
+  if (params.size() > 2)
+  {
+    throw std::invalid_argument(cli::warning("loadSet func takes only one parametr"));
+  }
+
+  std::string filename = params[1];
+  std::ifstream infile(filename);
+  if (!infile.is_open())
+  {
+    throw std::invalid_argument(cli::error("Cannot open settings file: " + filename));
+  }
+
+  bool isMuted = false;
+  float gainLow = 1.0;
+  float gainMid = 1.0;
+  float gainHigh = 1.0;
+  float cutRight = 0.0;
+  float cutLeft = 0.0;
+
+
+  std::string line;
+  while (std::getline(infile, line))
+  {
+    if (line.empty())
+    {
+      continue;
+    }
+    if (line.find("Muted status:") != std::string::npos)
+    {
+      isMuted = (line.find("Muted") != std::string::npos && line.find("Unmuted") == std::string::npos);
+    }
+    else if (line.find("Low frequencies volume:") != std::string::npos)
+    {
+      gainLow = extractFloat(line) / 100.0f;
+    }
+    else if (line.find("Mid frequencies volume:") != std::string::npos)
+    {
+      gainMid = extractFloat(line) / 100.0f;
+    }
+    else if (line.find("High frequencies volume:") != std::string::npos)
+    {
+      gainHigh = extractFloat(line) / 100.0f;
+    }
+    else if (line.find("Cut from the left:") != std::string::npos)
+    {
+      cutLeft = extractFloat(line);
+    }
+    else if (line.find("Cut from the right:") != std::string::npos)
+    {
+      cutRight = extractFloat(line);
+    }
+  }
+  infile.close();
+
+  equalizer.loadSettings(isMuted, gainLow, gainMid, gainHigh, cutLeft, cutRight);
+  cli::success(out, "Settings loaded");
+}
+
+void cli::exit(std::istream& in, std::ostream& out, const std::vector< std::string >&)
 {
   if (!isSaved)
   {
@@ -440,7 +533,17 @@ void cli::exit(std::istream& in, std::ostream& out, const std::vector< std::stri
   }
 }
 
+void cli::reset(std::istream&, std::ostream& out, const std::vector< std::string >&)
+{
+  if (!isLoaded)
+  {
+    throw std::invalid_argument(cli::error("Can't find track to reset settings"));
+  }
 
+  equalizer.reset();
+  cli::success(out, "Settings were reseted");
+  isSaved = false;
+}
 
 
 

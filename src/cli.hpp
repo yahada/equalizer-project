@@ -20,7 +20,8 @@ namespace equalizer
     void changeVolume(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
     void help(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
     void settings(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
-    void loadSettings(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
+    void getSettings(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
+    void reset(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
     // void cutLeft(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
     // void cutRight(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
     void success(std::ostream& out, const std::string& text);
@@ -29,7 +30,8 @@ namespace equalizer
     void printBanner(std::ostream& out);
     void exit(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
   private:
-    std::vector< std::string > getSplitedParams(std::istream& in);
+    float extractFloat(const std::string& line);
+    std::vector< std::string > getSettings(const std::string& filename);
     std::string fileName;
     equalizer::Equalizer equalizer;
     bool isLoaded = false;

@@ -36,7 +36,7 @@ void equalizer::Equalizer::loadSettings(bool mutedStatus, float gainLow, float g
   isMuted_ = mutedStatus;
   gainLow_ = gainLow;
   gainMid_ = gainMid;
-  gainLow_ = gainLow;
+  gainHigh_ = gainHigh;
   leftCut_ = cutLeft;
   rightCut_ = cutRight;
 }
@@ -189,4 +189,16 @@ void equalizer::Equalizer::changeVolume(const float& lowFreqGain, const float& m
     changedAudioData[i] = static_cast< int16_t >(resSample);
   }
   changedAudioData_ = changedAudioData;
+}
+
+void equalizer::Equalizer::reset()
+{
+  gainLow_ = 1.0;
+  gainMid_ = 1.0;
+  gainHigh_ = 1.0;
+
+  leftCut_ = 0.0;
+  rightCut_ = 0.0;
+
+  isMuted_ = false;
 }

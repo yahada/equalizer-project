@@ -20,6 +20,7 @@ namespace equalizer
     void StereoToMono();
     void reverse();
     void inversion();
+    void reset();
     void play();
   private:
     friend class cliEqualizer;

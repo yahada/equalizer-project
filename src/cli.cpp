@@ -23,7 +23,7 @@ void cli::printBanner(std::ostream& out)
 
 void cli::success(std::ostream& out, const std::string& text)
 {
-  out << "[OK] " << text;
+  out << "[OK] " << text << '\n';
 }
 
 std::string cli::error(const std::string& text)
@@ -87,7 +87,7 @@ void cli::load(std::istream& in, std::ostream& out, const std::vector< std::stri
   fileName = name;
   isSaved = true;
   isLoaded = true;
-  cliEqualizer::success(out, "Track loaded\n");
+  cliEqualizer::success(out, "Track loaded");
 }
 
 void cli::save(std::istream&, std::ostream& out, const std::vector< std::string >& params)
@@ -107,7 +107,7 @@ void cli::save(std::istream&, std::ostream& out, const std::vector< std::string 
     }
   }
   isSaved = true;
-  cliEqualizer::success(out, "Track saved\n");
+  cliEqualizer::success(out, "Track saved");
 
 }
 
@@ -128,7 +128,7 @@ void cli::rename(std::istream&, std::ostream& out, const std::vector< std::strin
   }
   equalizer.renameFile(fileName, name);
   fileName = name;
-  cliEqualizer::success(out, "Track renamed\n");
+  cliEqualizer::success(out, "Track renamed");
 
 }
 
@@ -168,7 +168,7 @@ void cli::getInfo(std::istream&, std::ostream& out, const std::vector< std::stri
       outfile << "<Info about file\n";
       outfile << "name: " << fileName << '\n';
       equalizer.showInfoAboutFile(outfile);
-      cli::success(out, "Saved to file: " + fileName);
+      cli::success(out, "Saved to file: " + res);
       outfile.close();
       return;
     }
@@ -190,7 +190,7 @@ void cli::mute(std::istream&, std::ostream& out, const std::vector< std::string 
   equalizer.changeMuteStatus();
   isSaved = false;
   }
-  cliEqualizer::success(out, "Track muted\n");
+  cliEqualizer::success(out, "Track muted");
 }
 
 void cli::unmute(std::istream&, std::ostream& out, const std::vector< std::string >&)
@@ -205,7 +205,7 @@ void cli::unmute(std::istream&, std::ostream& out, const std::vector< std::strin
     equalizer.changeMuteStatus();
     isSaved = false;
   }
-  cliEqualizer::success(out, "Track unmuted\n");
+  cliEqualizer::success(out, "Track unmuted");
 }
 
 void cli::reverse(std::istream&, std::ostream& out, const std::vector< std::string >&)
@@ -217,7 +217,7 @@ void cli::reverse(std::istream&, std::ostream& out, const std::vector< std::stri
 
   equalizer.reverse();
   isSaved = false;
-  cliEqualizer::success(out, "Track reversed\n");
+  cliEqualizer::success(out, "Track reversed");
 }
 
 void cli::inverse(std::istream&, std::ostream& out, const std::vector< std::string >&)
@@ -228,7 +228,7 @@ void cli::inverse(std::istream&, std::ostream& out, const std::vector< std::stri
   }
   equalizer.inversion();
   isSaved = false;
-  cliEqualizer::success(out, "Track inversed\n");
+  cliEqualizer::success(out, "Track inversed");
 }
 
 void cli::fromStereoToMono(std::istream&, std::ostream& out, const std::vector< std::string >&)
@@ -245,7 +245,7 @@ void cli::fromStereoToMono(std::istream&, std::ostream& out, const std::vector< 
   equalizer.StereoToMono();
   isSaved = false;
 
-  cliEqualizer::success(out, "Track was converted to mono\n");
+  cliEqualizer::success(out, "Track was converted to mono");
 }
 
 void cli::changeVolume(std::istream&, std::ostream& out, const std::vector< std::string >& params)
@@ -328,7 +328,7 @@ void cli::changeVolume(std::istream&, std::ostream& out, const std::vector< std:
   if (!highFlag && !midFlag && !lowsFlag)
   {
     equalizer.changeVolume(gain / 100, gain / 100, gain / 100);
-    cliEqualizer::success(out, "Volume updated\n");
+    cliEqualizer::success(out, "Volume updated");
     return;
   }
 
@@ -350,7 +350,7 @@ void cli::changeVolume(std::istream&, std::ostream& out, const std::vector< std:
   }
 
   equalizer.changeVolume(low, mid, high);
-  cliEqualizer::success(out, "Volume updated\n");
+  cliEqualizer::success(out, "Volume updated");
 }
 
 void cli::help(std::istream& in, std::ostream& out, const std::vector< std::string >& params)
@@ -401,7 +401,7 @@ void cli::settings(std::istream& in, std::ostream& out, const std::vector< std::
       }
       outfile << "Track settings\n";
       equalizer.getSettings(outfile);
-      cli::success(out, "Saved to file: " + fileName);
+      cli::success(out, "Saved to file: " + res);
       outfile.close();
       return;
     }

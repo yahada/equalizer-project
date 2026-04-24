@@ -40,6 +40,7 @@ int main()
   cmds["settings"] = &cliEqualizer::settings;
   cmds["reset"] = &cliEqualizer::reset;
   cmds["loadSet"] = &cliEqualizer::getSettings;
+  cmds["cut"] = &cliEqualizer::cut;
   cmds["exit"] = &cliEqualizer::exit;
 
   std::string line;

@@ -13,8 +13,7 @@ namespace equalizer
     void showInfoAboutFile(std::ostream&) const;
     void getSettings(std::ostream&) const;
     void loadSettings(bool, float, float, float, float, float);
-    void cutFromLeft(const float& cutSize);
-    void cutFromRight(const float& cutSize);
+    void changeDuration(float left, float right);
     void changeMuteStatus() noexcept;
     void changeVolume(const float& lowFreqGain, const float& midFreqGain, const float& highFreqGain);
     void StereoToMono();

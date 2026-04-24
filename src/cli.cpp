@@ -39,13 +39,9 @@ std::string cli::warning(const std::string& text)
 
 void cli::load(std::istream& in, std::ostream& out, const std::vector< std::string >& params)
 {
-  if (params.size() == 1)
+  if (params.size() != 2)
   {
-    throw std::invalid_argument(cli::error("No file to load"));
-  }
-  if (params.size() > 2)
-  {
-    throw std::invalid_argument(cli::warning("Load function takes only one parametr"));
+    throw std::invalid_argument(cli::warning("Usage: load <file>"));
   }
   std::string name = params[1];
   if (name == fileName)
@@ -94,7 +90,7 @@ void cli::save(std::istream&, std::ostream& out, const std::vector< std::string 
 {
   if (!isLoaded)
   {
-    throw std::invalid_argument(cli::error("No track to save"));
+    throw std::invalid_argument(cli::error("No file loaded. Use 'load <file>' first"));
   }
   if (params.size() == 1)
   {
@@ -113,13 +109,13 @@ void cli::save(std::istream&, std::ostream& out, const std::vector< std::string 
 
 void cli::rename(std::istream&, std::ostream& out, const std::vector< std::string >& params)
 {
-  if (!isLoaded || params.size() == 1)
+  if (!isLoaded)
   {
-    throw std::invalid_argument(cli::error("Can't find file to rename"));
+    throw std::invalid_argument(cli::error("No file loaded. Use 'load <file>' first"));
   }
-  if (params.size() > 2)
+  if (params.size() != 2)
   {
-    throw std::invalid_argument(cli::warning("Rename function takes only one parametr"));
+    throw std::invalid_argument(cli::warning("Usage: rename <file>"));
   }
   std::string name = params[1];
   if (fileName == name)
@@ -136,7 +132,7 @@ void cli::getInfo(std::istream&, std::ostream& out, const std::vector< std::stri
 {
   if (!isLoaded)
   {
-    throw std::invalid_argument(cli::error("Can't find file to get info about"));
+    throw std::invalid_argument(cli::error("No file loaded. Use 'load <file>' first"));
   }
   if (params.size() == 1)
   {
@@ -163,9 +159,9 @@ void cli::getInfo(std::istream&, std::ostream& out, const std::vector< std::stri
       std::ofstream outfile(res);
       if (!outfile)
       {
-        throw std::invalid_argument(cli::error("Can't find directory with this path: " + res));
+        throw std::invalid_argument(cli::error("Pathspec did not match any files"));
       }
-      outfile << "<Info about file\n";
+      outfile << "Info about file\n";
       outfile << "name: " << fileName << '\n';
       equalizer.showInfoAboutFile(outfile);
       cli::success(out, "Saved to file: " + res);
@@ -174,16 +170,20 @@ void cli::getInfo(std::istream&, std::ostream& out, const std::vector< std::stri
     }
     else
     {
-      throw std::invalid_argument(cli::warning("Unknown parametr: " + params[1]));
+      throw std::invalid_argument(cli::warning("Unknown option: " + params[1]));
     }
   }
 }
 
-void cli::mute(std::istream&, std::ostream& out, const std::vector< std::string >&)
+void cli::mute(std::istream&, std::ostream& out, const std::vector< std::string >& params)
 {
   if (!isLoaded)
   {
-    throw std::invalid_argument(cli::error("Can't find track to mute"));
+    throw std::invalid_argument(cli::error("No file loaded. Use 'load <file>' first"));
+  }
+  if (params.size() > 1)
+  {
+    throw std::invalid_argument(cli::error("Usage: mute <no-parameters>"));
   }
   if (!equalizer.isMuted_)
   {
@@ -193,11 +193,15 @@ void cli::mute(std::istream&, std::ostream& out, const std::vector< std::string 
   cliEqualizer::success(out, "Track muted");
 }
 
-void cli::unmute(std::istream&, std::ostream& out, const std::vector< std::string >&)
+void cli::unmute(std::istream&, std::ostream& out, const std::vector< std::string >& params)
 {
   if (!isLoaded)
   {
-    throw std::invalid_argument(cli::error("Can't find track to unmute"));
+    throw std::invalid_argument(cli::error("No file loaded. Use 'load <file>' first"));
+  }
+  if (params.size() > 1)
+  {
+    throw std::invalid_argument(cli::error("Usage: unmute <no-parameters>"));
   }
 
   if (equalizer.isMuted_)
@@ -208,39 +212,54 @@ void cli::unmute(std::istream&, std::ostream& out, const std::vector< std::strin
   cliEqualizer::success(out, "Track unmuted");
 }
 
-void cli::reverse(std::istream&, std::ostream& out, const std::vector< std::string >&)
+void cli::reverse(std::istream&, std::ostream& out, const std::vector< std::string >& params)
 {
   if (!isLoaded)
   {
-    throw std::invalid_argument(cli::error("Can't find track to reverse"));
+    throw std::invalid_argument(cli::error("No file loaded. Use 'load <file>' first"));
   }
 
+  if (params.size() > 1)
+  {
+    throw std::invalid_argument(cli::error("Usage: reverse <no-parameters>"));
+  }
   equalizer.reverse();
   isSaved = false;
   cliEqualizer::success(out, "Track reversed");
 }
 
-void cli::inverse(std::istream&, std::ostream& out, const std::vector< std::string >&)
+void cli::inverse(std::istream&, std::ostream& out, const std::vector< std::string >& params)
 {
   if (!isLoaded)
   {
-    throw std::invalid_argument(cli::error("Can't find track to inverse"));
+    throw std::invalid_argument(cli::error("No file loaded. Use 'load <file>' first"));
   }
+
+  if (params.size() > 1)
+  {
+    throw std::invalid_argument(cli::error("Usage: inverse <no-parameters>"));
+  }
+
   equalizer.inversion();
   isSaved = false;
   cliEqualizer::success(out, "Track inversed");
 }
 
-void cli::fromStereoToMono(std::istream&, std::ostream& out, const std::vector< std::string >&)
+void cli::fromStereoToMono(std::istream&, std::ostream& out, const std::vector< std::string >& params)
 {
   if (!isLoaded)
   {
-    throw std::invalid_argument(cli::error("Can't find track to convert"));
+    throw std::invalid_argument(cli::error("No file loaded. Use 'load <file>' first"));
+  }
+
+  if (params.size() > 1)
+  {
+    throw std::invalid_argument(cli::error("Usage: convert <no-parameters>"));
   }
 
   if (equalizer.header_.numChannels_ == 1)
   {
-    throw std::invalid_argument(cli::warning("Track is already in mono format"));
+    throw std::invalid_argument(cli::warning("Track is already mono"));
   }
   equalizer.StereoToMono();
   isSaved = false;
@@ -252,17 +271,16 @@ void cli::changeVolume(std::istream&, std::ostream& out, const std::vector< std:
 {
   if (!isLoaded)
   {
-    throw std::invalid_argument(cli::error("Can't find track to change volume"));
+    throw std::invalid_argument(cli::error("No file loaded. Use 'load <file>' first"));
   }
 
   if (params.size() == 1)
   {
-    throw std::invalid_argument(cli::warning("No parametrs found. Use --help for more information"));
+    throw std::invalid_argument(cli::warning("No parameters found. Use --help for more information"));
   }
 
   if (params[1] == "--help")
   {
-    out << "\n";
     out << "VOLUME COMMAND\n";
     out << "Usage:\n";
     out << "  volume <gain> [-l] [-m] [-h]\n";
@@ -286,6 +304,7 @@ void cli::changeVolume(std::istream&, std::ostream& out, const std::vector< std:
     equalizer.gainLow_ = 1.0;
     equalizer.gainMid_ = 1.0;
     equalizer.gainHigh_ = 1.0;
+    return;
   }
 
   float gain = 0.0;
@@ -295,7 +314,7 @@ void cli::changeVolume(std::istream&, std::ostream& out, const std::vector< std:
   }
   catch(...)
   {
-    throw std::invalid_argument(cli::error("First parametr must be integer"));
+    throw std::invalid_argument(cli::error("Unknown parameter: " + params[1]));
   }
 
   if (gain < -200.0 || gain > 200.0)
@@ -308,7 +327,6 @@ void cli::changeVolume(std::istream&, std::ostream& out, const std::vector< std:
   bool highFlag = false;
   for (size_t i = 2; i < params.size(); ++i)
   {
-
     if (params[i] != "-h" && params[i] != "-m" && params[i] != "-l")
     {
       throw std::invalid_argument(cli::error("Unknown option: " + params[i]));
@@ -367,6 +385,7 @@ void cli::help(std::istream& in, std::ostream& out, const std::vector< std::stri
   out << "inverse                       - invert waveform\n";
   out << "convert                       - convert stereo to mono\n";
   out << "volume <gain> [-l] [-m] [-h]  - change volume\n";
+  out << "cut <duration> [-l] [-r]      - edit duration of track\n";
   out << "setting [-f]                  - show settings or export it to the file\n";
   out << "loadSet <file>                - load settings from file\n";
   out << "reset                         - reset all settings\n";
@@ -377,7 +396,7 @@ void cli::settings(std::istream& in, std::ostream& out, const std::vector< std::
 {
   if (!isLoaded)
   {
-    throw std::invalid_argument(cli::error("Can't find track to get settings"));
+    throw std::invalid_argument(cli::error("No file loaded. Use 'load <file>' first"));
   }
   if (params.size() == 1)
   {
@@ -402,7 +421,7 @@ void cli::settings(std::istream& in, std::ostream& out, const std::vector< std::
       std::ofstream outfile(res);
       if (!outfile)
       {
-        throw std::invalid_argument(cli::error("Can't find directory with this path: " + res));
+        throw std::invalid_argument(cli::error("Pathspec did not match any files"));
       }
       outfile << "Track settings\n";
       equalizer.getSettings(outfile);
@@ -412,7 +431,7 @@ void cli::settings(std::istream& in, std::ostream& out, const std::vector< std::
     }
     else
     {
-      throw std::invalid_argument(cli::warning("Unknown parametr: " + params[1]));
+      throw std::invalid_argument(cli::warning("Unknown option: " + params[1]));
     }
   }
 }
@@ -445,12 +464,12 @@ void cli::getSettings(std::istream&, std::ostream& out, const std::vector< std::
 {
   if (!isLoaded)
   {
-    throw std::invalid_argument(cli::error("Can't find track to set settings"));
+    throw std::invalid_argument(cli::error("No file loaded. Use 'load <file>' first"));
   }
 
   if (params.size() > 2)
   {
-    throw std::invalid_argument(cli::warning("loadSet func takes only one parametr"));
+    throw std::invalid_argument(cli::warning("Usage: loadSet <file>"));
   }
 
   std::string filename = params[1];
@@ -506,6 +525,67 @@ void cli::getSettings(std::istream&, std::ostream& out, const std::vector< std::
   cli::success(out, "Settings loaded");
 }
 
+void cli::cut(std::istream&, std::ostream& out, const std::vector< std::string >& params)
+{
+  if (!isLoaded)
+  {
+    throw std::invalid_argument(cli::error("No file loaded. Use 'load <file>' first"));
+  }
+
+  if (params[1] == "reset")
+  {
+    equalizer.rightCut_ = 0.0;
+    equalizer.leftCut_ = 0.0;
+    return;
+  }
+
+  float cutSize = 0;
+  try
+  {
+    cutSize = std::stof(params[1]);
+  }
+  catch(...)
+  {
+    throw std::invalid_argument(cli::error("Unknown parametr: " + params[1]));
+  }
+
+  bool leftFlag = false;
+  bool rightFlag = false;
+  for (size_t i = 2; i < params.size(); ++i)
+  {
+    if (params[i] != "-l" && params[i] != "-r")
+    {
+      throw std::invalid_argument(cli::error("Unknown option: " + params[i]));
+    }
+    if (params[i] == "-l")
+    {
+      leftFlag = true;
+    } else
+    {
+      rightFlag = true;
+    }
+  }
+
+  float left = 0.0f;
+  float right = 0.0f;
+
+  if (!rightFlag && !leftFlag)
+  {
+    left = cutSize;
+    right = cutSize;
+  }
+  else
+  {
+    if (leftFlag)  left = cutSize;
+    if (rightFlag) right = cutSize;
+  }
+
+  equalizer.changeDuration(left, right);
+  isSaved = false;
+  cli::success(out, "Duration changed");
+}
+
+
 void cli::exit(std::istream& in, std::ostream& out, const std::vector< std::string >&)
 {
   if (!isSaved)
@@ -537,11 +617,11 @@ void cli::reset(std::istream&, std::ostream& out, const std::vector< std::string
 {
   if (!isLoaded)
   {
-    throw std::invalid_argument(cli::error("Can't find track to reset settings"));
+    throw std::invalid_argument(cli::error("No file loaded. Use 'load <file>' first"));
   }
 
   equalizer.reset();
-  cli::success(out, "Settings were reseted");
+  cli::success(out, "The settings have been reseted");
   isSaved = false;
 }
 

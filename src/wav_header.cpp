@@ -58,7 +58,7 @@ void equalizer::WavHeader::readWavFile(const std::string& filename, std::vector<
 
   if (!file.is_open())
   {
-    throw std::invalid_argument("File opening trouble");
+    throw std::invalid_argument("Pathspec did not match any files");
   }
 
   file.read(reinterpret_cast< char* >(this), sizeof(WavHeader));

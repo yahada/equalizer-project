@@ -127,14 +127,22 @@ void equalizer::Equalizer::reverse()
   changedAudioData_ = reversedData;
 }
 
-void equalizer::Equalizer::cutFromLeft(const float& cutSize)
+void equalizer::Equalizer::changeDuration(float left, float right)
 {
-  leftCut_ = cutSize;
-}
+  if (left < 0 || right < 0)
+    throw std::invalid_argument("Cuts must be non-negative");
 
-void equalizer::Equalizer::cutFromRight(const float& cutSize)
-{
-  rightCut_ = cutSize;
+  float totalDuration = static_cast<float>(changedAudioData_.size()) / (header_.sampleRate_ * header_.numChannels_);
+
+  if (left + right >= totalDuration)
+    throw std::invalid_argument("Cut range too large");
+
+  size_t startSample = static_cast<size_t>(left * header_.sampleRate_ * header_.numChannels_);
+  size_t endSample = static_cast<size_t>((audioData_.size() / (header_.sampleRate_ * header_.numChannels_) - right) * header_.sampleRate_ * header_.numChannels_);
+
+  changedAudioData_.assign(changedAudioData_.begin() + startSample, changedAudioData_.begin() + endSample);
+  leftCut_ = left;
+  rightCut_ = right;
 }
 
 void equalizer::Equalizer::changeMuteStatus() noexcept

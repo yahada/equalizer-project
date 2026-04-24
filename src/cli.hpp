@@ -22,8 +22,7 @@ namespace equalizer
     void settings(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
     void getSettings(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
     void reset(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
-    // void cutLeft(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
-    // void cutRight(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
+    void cut(std::istream& in, std::ostream& out, const std::vector< std::string >& params);
     void success(std::ostream& out, const std::string& text);
     std::string error(const std::string& text);
     std::string warning(const std::string& text);

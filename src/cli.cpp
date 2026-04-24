@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <sstream>
 #include <cctype>
+#include <limits>
 #include <filesystem>
 
 using cli = equalizer::cliEqualizer;
@@ -66,9 +67,9 @@ void cli::load(std::istream& in, std::ostream& out, const std::vector< std::stri
       std::string newFileName;
       out << "Enter new name of the file: ";
       in >> newFileName;
-      std::vector< std::string > tmpParams = {0, newFileName};
-      cli::save(in, out, tmpParams);
-      return;
+      in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      equalizer.saveFile(newFileName);
+      cliEqualizer::success(out, "Track saved");
     }
   }
   try
@@ -104,7 +105,6 @@ void cli::save(std::istream&, std::ostream& out, const std::vector< std::string 
   }
   isSaved = true;
   cliEqualizer::success(out, "Track saved");
-
 }
 
 void cli::rename(std::istream&, std::ostream& out, const std::vector< std::string >& params)
@@ -373,7 +373,7 @@ void cli::changeVolume(std::istream&, std::ostream& out, const std::vector< std:
   cliEqualizer::success(out, "Volume updated");
 }
 
-void cli::help(std::istream& in, std::ostream& out, const std::vector< std::string >& params)
+void cli::help(std::istream&, std::ostream& out, const std::vector< std::string >&)
 {
   out << "AVAILABLE COMMANDS\n";
   out << "load <file>                   - load audio file\n";
@@ -392,7 +392,7 @@ void cli::help(std::istream& in, std::ostream& out, const std::vector< std::stri
   out << "exit                          - exit program\n";
 }
 
-void cli::settings(std::istream& in, std::ostream& out, const std::vector< std::string >& params)
+void cli::settings(std::istream&, std::ostream& out, const std::vector< std::string >& params)
 {
   if (!isLoaded)
   {
@@ -606,9 +606,9 @@ void cli::exit(std::istream& in, std::ostream& out, const std::vector< std::stri
       std::string newFileName;
       out << "Enter new name of the file: ";
       in >> newFileName;
-      std::vector< std::string > tmpParams = {0, newFileName};
-      cli::save(in, out, tmpParams);
-      return;
+      in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      equalizer.saveFile(newFileName);
+      cliEqualizer::success(out, "Track saved");
     }
   }
 }

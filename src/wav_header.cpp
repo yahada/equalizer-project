@@ -56,7 +56,7 @@ void equalizer::WavHeader::readWavFile(const std::string& filename, std::vector<
 
   std::ifstream file(filename, std::ios::binary);
 
-  if (!file.is_open())
+  if (!file)
   {
     throw std::invalid_argument("Pathspec did not match any files");
   }
@@ -79,8 +79,7 @@ void equalizer::WavHeader::saveWav(const std::string& filename, const std::vecto
   std::ofstream file(filename, std::ios::binary);
   if (!file.is_open())
   {
-    std::cerr << "Problems with creation file" << filename << "\n";
-    throw;
+    throw std::runtime_error("Cannot create file: " + filename);
   }
   file.write(reinterpret_cast< const char* >(this), sizeof(WavHeader));
   file.write(reinterpret_cast< const char* >(audioData.data()), audioData.size() * sizeof(int16_t));

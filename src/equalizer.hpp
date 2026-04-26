@@ -11,7 +11,15 @@ namespace equalizer
     void saveFile(const std::string&);
     void renameFile(const std::string&, const std::string&);
     void showInfoAboutFile(std::ostream&) const;
+    void resetChanges();
+    void cutSegment(float positionRatio, float durationSeconds);
+    void trimToRange(float startRatio, float endRatio);
 
+    const std::vector< int16_t >& processedAudioData() const noexcept;
+    uint32_t sampleRate() const noexcept;
+    uint16_t numChannels() const noexcept;
+    float durationSeconds() const noexcept;
+    bool getUiStatus() const noexcept;
     void cutFromLeft(const float& cutSize);
     void cutFromRight(const float& cutSize);
     void changeMuteStatus() noexcept;
@@ -31,7 +39,9 @@ namespace equalizer
     float gainLow_ = 1.0f;
     float gainMid_ = 1.0f;
     float gainHigh_ = 1.0f;
+    void refreshHeaderSizes() noexcept;
     std::vector< float > convert();
+    bool uiStatus = false;
   };
 }
 

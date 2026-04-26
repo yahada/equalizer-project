@@ -17,7 +17,7 @@ bool equalizer::WavHeader::checkCorrectnessOfHeader(std::string& errorMsg)
 
   if (sampleRate_ != 44100 && sampleRate_ != 48000)
   {
-    errorMsg = "Equalizer support work with files with sample rate = 44100 or 4800 Hz";
+    errorMsg = "Equalizer supports files with sample rate 44100 or 48000 Hz";
     return false;
   }
 
@@ -49,16 +49,21 @@ bool equalizer::WavHeader::checkCorrectnessOfHeader(std::string& errorMsg)
 
 void equalizer::WavHeader::readWavFile(const std::string& filename, std::vector< int16_t >& audioData)
 {
+  if (filename.size() < 4)
+  {
+    throw std::invalid_argument("Wrong file format: " + filename);
+  }
+
   if (filename.substr(filename.size() - 4, 4) != ".wav")
   {
-    throw std::invalid_argument("Wrong file format");
+    throw std::invalid_argument("Wrong file format: " + filename);
   }
 
   std::ifstream file(filename, std::ios::binary);
 
   if (!file.is_open())
   {
-    throw std::invalid_argument("File opening trouble");
+    throw std::invalid_argument("Cannot open file: " + filename);
   }
 
   file.read(reinterpret_cast< char* >(&(*this)), sizeof(WavHeader));
@@ -79,8 +84,7 @@ void equalizer::WavHeader::saveWav(const std::string& filename, const std::vecto
   std::ofstream file(filename, std::ios::binary);
   if (!file.is_open())
   {
-    std::cerr << "Problems with creation file" << filename << "\n";
-    throw;
+    throw std::runtime_error("Problems with creating file: " + filename);
   }
   file.write(reinterpret_cast< const char* >(&(*this)), sizeof(WavHeader));
   file.write(reinterpret_cast< const char* >(audioData.data()), audioData.size() * sizeof(int16_t));

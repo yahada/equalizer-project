@@ -61,12 +61,12 @@ void equalizer::WavHeader::readWavFile(const std::string& filename, std::vector<
 
   std::ifstream file(filename, std::ios::binary);
 
-  if (!file.is_open())
+  if (!file)
   {
     throw std::invalid_argument("Cannot open file: " + filename);
   }
 
-  file.read(reinterpret_cast< char* >(&(*this)), sizeof(WavHeader));
+  file.read(reinterpret_cast< char* >(this), sizeof(WavHeader));
 
   std::string errMsg;
   if (!checkCorrectnessOfHeader(errMsg))
@@ -86,7 +86,7 @@ void equalizer::WavHeader::saveWav(const std::string& filename, const std::vecto
   {
     throw std::runtime_error("Problems with creating file: " + filename);
   }
-  file.write(reinterpret_cast< const char* >(&(*this)), sizeof(WavHeader));
+  file.write(reinterpret_cast< const char* >(this), sizeof(WavHeader));
   file.write(reinterpret_cast< const char* >(audioData.data()), audioData.size() * sizeof(int16_t));
 }
 

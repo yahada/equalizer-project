@@ -1,7 +1,7 @@
 #include "equalizer_ui.hpp"
 #include "equalizer.hpp"
 
-#include <imgui.h>
+#include <imgui/imgui.h>
 
 #include <algorithm>
 #include <cstdio>

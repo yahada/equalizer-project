@@ -1,16 +1,20 @@
-IMGUI_DIR := ../../imgui-project/imgui
-SRC_DIR := src
+CXX := g++
 
-CXXFLAGS += -Wall -Wextra -std=c++17
+IMGUI_DIR := imgui
+SRC_DIR := src
+BUILD_DIR := lib
+
+CXXFLAGS += -Wall -Wextra -std=c++17 -MMD
 CPPFLAGS += -I. -I$(SRC_DIR) -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends
 LDLIBS += -lglfw -lGL
 
-SOURCES := \
+SRCS := \
 	$(SRC_DIR)/main.cpp \
-	equalizer_ui.cpp \
 	$(SRC_DIR)/filter.cpp \
 	$(SRC_DIR)/equalizer.cpp \
 	$(SRC_DIR)/wav_header.cpp \
+	$(SRC_DIR)/cli.cpp \
+	$(SRC_DIR)/equalizer_ui.cpp \
 	$(IMGUI_DIR)/imgui.cpp \
 	$(IMGUI_DIR)/imgui_draw.cpp \
 	$(IMGUI_DIR)/imgui_widgets.cpp \
@@ -18,11 +22,21 @@ SOURCES := \
 	$(IMGUI_DIR)/backends/imgui_impl_glfw.cpp \
 	$(IMGUI_DIR)/backends/imgui_impl_opengl3.cpp
 
-main: $(SOURCES)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@ $(LDLIBS)
+OBJS := $(SRCS:%.cpp=$(BUILD_DIR)/%.o)
+DEPS := $(OBJS:.o=.d)
+
+main: $(OBJS)
+	mkdir -p $(BUILD_DIR)
+	$(CXX) $^ -o $(BUILD_DIR)/$@ $(LDLIBS)
+
+$(BUILD_DIR)/%.o: %.cpp
+	mkdir -p $(dir $@)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 run: main
-	./main
+	./$(BUILD_DIR)/main
 
 clean:
-	@$(RM) main
+	rm -rf $(BUILD_DIR)
+
+-include $(DEPS)

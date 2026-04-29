@@ -4,3 +4,4 @@ main
 *.o
 *.d
 .vscode/
+*.txt

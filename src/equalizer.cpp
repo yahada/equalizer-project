@@ -33,6 +33,26 @@ bool equalizer::Equalizer::getUiStatus() const noexcept
   return uiStatus;
 }
 
+void equalizer::Equalizer::getSettings(std::ostream& out) const
+{
+  out << "Muted status: " << (isMuted_ ? "Muted" : "Unmuted") << '\n';
+  out << "Low frequencies volume: " << gainLow_ * 100 << "%\n";
+  out << "Mid frequencies volume: " << gainMid_ * 100 << "%\n";
+  out << "High frequencies volume: " << gainHigh_ * 100 << "%\n";
+  out << "Cut from the left: " << leftCut_ << "sec\n";
+  out << "Cut from the right: " << rightCut_ << "sec\n";
+}
+
+void equalizer::Equalizer::loadSettings(bool mutedStatus, float gainLow, float gainMid, float gainHigh, float cutLeft, float cutRight)
+{
+  isMuted_ = mutedStatus;
+  gainLow_ = gainLow;
+  gainMid_ = gainMid;
+  gainHigh_ = gainHigh;
+  leftCut_ = cutLeft;
+  rightCut_ = cutRight;
+}
+
 void equalizer::Equalizer::openFile(const std::string& filename)
 {
   WavHeader header;
@@ -41,10 +61,23 @@ void equalizer::Equalizer::openFile(const std::string& filename)
   header_ = header;
   audioData_ = audioData;
   changedAudioData_ = audioData_;
+
+  isMuted_ = false;
+  leftCut_ = 0.0f;
+  rightCut_ = 0.0f;
+  gainLow_ = 1.0f;
+  gainMid_ = 1.0f;
+  gainHigh_ = 1.0f;
 }
 
 void equalizer::Equalizer::saveFile(const std::string& filename)
 {
+  if (isMuted_)
+  {
+    std::vector< int16_t > tmpAudioData(changedAudioData_.size(), 0);
+    header_.saveWav(filename, tmpAudioData);
+    return;
+  }
   header_.saveWav(filename, changedAudioData_);
 }
 
@@ -55,6 +88,8 @@ void equalizer::Equalizer::resetChanges()
   gainLow_ = 1.0f;
   gainMid_ = 1.0f;
   gainHigh_ = 1.0f;
+  leftCut_ = 0.0;
+  rightCut_ = 0.0;
 }
 
 void equalizer::Equalizer::cutSegment(float positionRatio, float durationSeconds)
@@ -180,25 +215,27 @@ void equalizer::Equalizer::showInfoAboutFile(std::ostream& out) const
 
 std::vector< float > equalizer::Equalizer::convert()
 {
-    std::vector< float > samples(audioData_.size());
-    for (size_t i = 0; i < audioData_.size(); ++i)
-    {
-      samples[i] = audioData_[i] / 32768.0f;
-    }
-    return samples;
+  std::vector< float > samples(audioData_.size());
+  for (size_t i = 0; i < audioData_.size(); ++i)
+  {
+    samples[i] = audioData_[i] / 32768.0f;
+  }
+  return samples;
 }
 
 void equalizer::Equalizer::inversion()
 {
   std::vector< int16_t > inversedData(audioData_.size());
   for (size_t i = 0; i < audioData_.size(); ++i)
-  if (changedAudioData_[i] == -32768)
   {
-    inversedData[i] = 32767;
-  }
-  else
-  {
-    inversedData[i] = -changedAudioData_[i];
+    if (changedAudioData_[i] == -32768)
+    {
+      inversedData[i] = 32767;
+    }
+    else
+    {
+      inversedData[i] = -changedAudioData_[i];
+    }
   }
   changedAudioData_ = inversedData;
 }
@@ -213,14 +250,24 @@ void equalizer::Equalizer::reverse()
   changedAudioData_ = reversedData;
 }
 
-void equalizer::Equalizer::cutFromLeft(const float& cutSize)
+void equalizer::Equalizer::changeDuration(float left, float right)
 {
-  leftCut_ = cutSize;
-}
+  if (left < 0 || right < 0)
+  {
+    throw std::invalid_argument("Cuts must be non-negative");
+  }
 
-void equalizer::Equalizer::cutFromRight(const float& cutSize)
-{
-  RightCut_ = cutSize;
+  float totalDuration = static_cast<float>(changedAudioData_.size()) / (header_.sampleRate_ * header_.numChannels_);
+
+  if (left + right >= totalDuration)
+    throw std::invalid_argument("Cut range too large");
+
+  size_t startSample = static_cast<size_t>(left * header_.sampleRate_ * header_.numChannels_);
+  size_t endSample = static_cast<size_t>((audioData_.size() / (header_.sampleRate_ * header_.numChannels_) - right) * header_.sampleRate_ * header_.numChannels_);
+
+  changedAudioData_.assign(changedAudioData_.begin() + startSample, changedAudioData_.begin() + endSample);
+  leftCut_ = left;
+  rightCut_ = right;
 }
 
 void equalizer::Equalizer::changeMuteStatus() noexcept
@@ -235,8 +282,29 @@ void equalizer::Equalizer::changeVolume(const float& lowFreqGain, const float& m
   equalizer::BiquadFilter lbf(equalizer::FilterTypeEnum::bq_type_lowpass, 200.0 / header_.sampleRate_, 0.707, 0);
   equalizer::BiquadFilter hbf(equalizer::FilterTypeEnum::bq_type_highpass, 3000.0 / header_.sampleRate_, 0.707, 0);
   gainLow_ += lowFreqGain;
+  if (gainLow_ > 2.0)
+  {
+    gainLow_ = 2.0;
+  } else if (gainLow_ < 0)
+  {
+    gainLow_ = 0.0;
+  }
   gainMid_ += midFreqGain;
+  if (gainMid_ > 2.0)
+  {
+    gainMid_ = 2.0;
+  } else if (gainMid_ < 0)
+  {
+    gainMid_ = 0.0;
+  }
   gainHigh_ += highFreqGain;
+  if (gainHigh_ > 2.0)
+  {
+    gainHigh_ = 2.0;
+  } else if (gainHigh_ < 0)
+  {
+    gainHigh_ = 0.0;
+  }
   for (size_t i = 0; i < audioData_.size(); ++i)
   {
     float lowFreqSample = lbf.process(convertedData[i]);
@@ -244,11 +312,13 @@ void equalizer::Equalizer::changeVolume(const float& lowFreqGain, const float& m
     float midFreqSample = (convertedData[i] - lowFreqSample - highFreqSample);
 
     lowFreqSample *= gainLow_;
-    highFreqSample *= gainMid_;
-    midFreqSample *= gainHigh_;
+    highFreqSample *= gainHigh_;
+    midFreqSample *= gainMid_;
 
     float resSample = (lowFreqSample + highFreqSample + midFreqSample) * 32768.0f;
-    resSample = std::max(-32768.0f, std::min(32767.0f, resSample));
+    if (resSample > 32767) resSample = 32767;
+    if (resSample < -32768) resSample = -32768;
+
     changedAudioData[i] = static_cast< int16_t >(resSample);
   }
   changedAudioData_ = changedAudioData;

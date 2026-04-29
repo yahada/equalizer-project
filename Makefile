@@ -1,5 +1,5 @@
 CXX := g++
-
+Q := @
 IMGUI_DIR := imgui
 SRC_DIR := src
 BUILD_DIR := lib
@@ -26,17 +26,19 @@ OBJS := $(SRCS:%.cpp=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
 
 main: $(OBJS)
-	mkdir -p $(BUILD_DIR)
-	$(CXX) $^ -o $(BUILD_DIR)/$@ $(LDLIBS)
+	$(Q)mkdir -p $(BUILD_DIR)
+	$(Q)$(CXX) $^ -o $(BUILD_DIR)/$@ $(LDLIBS)
 
 $(BUILD_DIR)/%.o: %.cpp
-	mkdir -p $(dir $@)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+	$(Q)printf "[CXX] %s\n" "$<"
+	$(Q)mkdir -p $(dir $@)
+	$(Q)$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 run: main
-	./$(BUILD_DIR)/main
+	$(Q)./$(BUILD_DIR)/main
 
 clean:
-	rm -rf $(BUILD_DIR)
+	$(Q)rm -rf $(BUILD_DIR)
+	$(Q)printf "[CLEAN]\n"
 
 -include $(DEPS)

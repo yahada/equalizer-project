@@ -44,8 +44,10 @@ void equalizer::Equalizer::loadSettings(bool mutedStatus, float gainLow, float g
   gainLow_ = gainLow;
   gainMid_ = gainMid;
   gainHigh_ = gainHigh;
+  changeVolume(gainLow_, gainMid_, gainHigh_);
   leftCut_ = cutLeft;
   rightCut_ = cutRight;
+  changeDuration(leftCut_, rightCut_);
 }
 
 void equalizer::Equalizer::openFile(const std::string& filename)

@@ -148,4 +148,15 @@ BOOST_AUTO_TEST_CASE(changeDuration)
   BOOST_CHECK_CLOSE(dur - 2.0, eq.durationSeconds(), 1);
 }
 
+BOOST_AUTO_TEST_CASE(loadSettings)
+{
+  equalizer::Equalizer eq;
+  eq.openFile("samples/file_example_WAV_1MG.wav");
+  float dur = eq.durationSeconds();
+  std::vector< int16_t > originalData = eq.processedAudioData();
+  eq.loadSettings(false, 1.0, -1.0, 1.0, 1.0, 1.0);
+  BOOST_CHECK_CLOSE(dur - 2.0, eq.durationSeconds(), 1);
+  BOOST_CHECK(originalData != eq.processedAudioData());
+}
+
 BOOST_AUTO_TEST_SUITE_END()

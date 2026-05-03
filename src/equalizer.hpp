@@ -18,10 +18,14 @@ namespace equalizer
     uint32_t sampleRate() const noexcept;
     uint16_t numChannels() const noexcept;
     float durationSeconds() const noexcept;
-    bool getUiStatus() const noexcept;
     void getSettings(std::ostream&) const;
     void loadSettings(bool, float, float, float, float, float);
     void changeDuration(float left, float right);
+    void cutLeft(float left);
+    void cutRight(float right);
+    void changeLow(float gain);
+    void changeMid(float gain);
+    void changeHigh(float gain);
     void changeMuteStatus() noexcept;
     void changeVolume(const float& lowFreqGain, const float& midFreqGain, const float& highFreqGain);
     void StereoToMono();
